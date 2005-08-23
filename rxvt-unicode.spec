@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        5.5
-Release:        3.fc5
+Version:        5.7
+Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -65,7 +65,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*
 
 %changelog
+* Tue Aug 23 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+5.7-1
+- version upgrade
+
 * Sun Jun 05 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+5.5-3
 - add dist
 
 * Thu Jun 02 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
