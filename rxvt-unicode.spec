@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        5.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -37,7 +37,7 @@ Xft fonts.
   --enable-mousewheel --enable-slipwheeling --enable-smart-resize \
   --enable-pointer-blank --enable-xpm-background --enable-next-scroll \
   --enable-xim --enable-linespace --with-save-lines=2000 --enable-resources \
-  --with-codesets=all
+  --with-codesets=all --enable-combining --enable-iso14755
 
 make CFLAGS="${RPM_OPT_FLAGS}" %{?_smp_mflags}
 
@@ -65,6 +65,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*
 
 %changelog
+* Sat Sep 17 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+5.7-2
+- enable iso14755 (#168548)
+
 * Tue Aug 23 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 5.7-1
 - version upgrade
