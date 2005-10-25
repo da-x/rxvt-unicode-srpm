@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        5.7
-Release:        3%{?dist}
+Version:        5.8
+Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -65,6 +65,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*
 
 %changelog
+* Tue Oct 25 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+5.8-1
+- version upgrade
+
 * Sun Oct 16 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 5.7-3
 - enable frills (#170965)
