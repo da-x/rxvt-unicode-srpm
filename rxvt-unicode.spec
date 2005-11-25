@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        5.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -13,9 +13,12 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib2-devel
-BuildRequires:  xorg-x11-devel
 BuildRequires:  /usr/bin/tic
 BuildRequires:  desktop-file-utils
+BuildRequires:  libX11-devel
+BuildRequires:  libXft-devel
+BuildRequires:  libXpm-devel
+BuildRequires:  libXrender-devel
 
 %description
 rxvt-unicode is a clone of the well known terminal emulator rxvt, modified to
@@ -65,6 +68,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/*
 
 %changelog
+* Fri Nov 25 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+5.8-2
+- modular xorg integration
+
 * Tue Oct 25 2005 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 5.8-1
 - version upgrade
