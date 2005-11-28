@@ -19,6 +19,7 @@ BuildRequires:  libX11-devel
 BuildRequires:  libXft-devel
 BuildRequires:  libXpm-devel
 BuildRequires:  libXrender-devel
+BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
 
 %description
