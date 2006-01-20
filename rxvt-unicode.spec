@@ -63,7 +63,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc README.FAQ INSTALL doc/README.menu doc/etc doc/changes.txt COPYING
+%doc README.FAQ INSTALL doc/README.xvt doc/etc doc/changes.txt COPYING
 %{_bindir}/*
 %{_datadir}/terminfo/r/*
 %{_mandir}/man*/*
