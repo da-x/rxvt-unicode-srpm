@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        7.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -71,6 +71,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Thu Feb 16 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+7.6-2
+- Rebuild for Fedora Extras 5
+
 * Fri Feb 10 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 7.6-1
 - version upgrade
