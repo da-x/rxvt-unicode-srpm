@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        7.6
-Release:        2%{?dist}
+Version:        7.7
+Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -42,7 +42,9 @@ Xft fonts.
   --enable-mousewheel --enable-slipwheeling --enable-smart-resize \
   --enable-pointer-blank --enable-xpm-background --enable-next-scroll \
   --enable-xim --enable-linespace --with-save-lines=2000 --enable-resources \
-  --with-codesets=all --enable-combining --enable-iso14755 --enable-frills
+  --with-codesets=all --enable-combining --enable-iso14755 --enable-frills \
+  --with-xpm-includes=%{_includedir}/X11 \
+  --with-xpm-library=%{_libdir}
 
 make CFLAGS="${RPM_OPT_FLAGS}" %{?_smp_mflags}
 
@@ -71,6 +73,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Tue Feb 21 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+7.7-1
+- version upgrade
+
 * Thu Feb 16 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 7.6-2
 - Rebuild for Fedora Extras 5
