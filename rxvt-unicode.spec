@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -52,8 +52,6 @@ make CFLAGS="${RPM_OPT_FLAGS}" %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
-tic -o $RPM_BUILD_ROOT/%_datadir/terminfo doc/etc/rxvt-unicode.terminfo
-
 desktop-file-install \
   --vendor=fedora \
   --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
@@ -67,12 +65,15 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc README.FAQ INSTALL doc/README.xvt doc/etc doc/changes.txt COPYING
 %{_bindir}/*
-%{_datadir}/terminfo/r/*
 %{_mandir}/man*/*
 %{_datadir}/applications/*
 %{_libdir}/urxvt
 
 %changelog
+* Sun Jan 21 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+8.1-2
+- drop terminfo file it is included in ncurses now
+
 * Fri Dec 08 2006 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 8.1-1
 - version upgrade
