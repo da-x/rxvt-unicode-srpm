@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        8.1
-Release:        2%{?dist}
+Version:        8.2
+Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -70,6 +70,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Sat Jun 02 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+8.2-1
+- version upgrade (#239421)
+
 * Sun Jan 21 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 8.1-2
 - drop terminfo file it is included in ncurses now
