@@ -1,10 +1,10 @@
 Name:           rxvt-unicode
-Version:        8.2
+Version:        8.3
 Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
-License:        GPL
+License:        GPLv2+
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%name/%name-%version.tar.bz2
 Source1:        rxvt-unicode.desktop
@@ -70,6 +70,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Wed Aug 22 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 8.3-1
+- version upgrade
+- new license tag
+
 * Sat Jun 02 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 8.2-1
 - version upgrade (#239421)
