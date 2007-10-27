@@ -21,6 +21,7 @@ BuildRequires:  libXpm-devel
 BuildRequires:  libXrender-devel
 BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
+BuildRequires:  perl-devel
 
 %description
 rxvt-unicode is a clone of the well known terminal emulator rxvt, modified to
