@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        8.4
-Release:        1%{?dist}
+Version:        8.5a
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -8,6 +8,7 @@ License:        GPLv2+
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%name/%name-%version.tar.bz2
 Source1:        rxvt-unicode.desktop
+#Patch0:         urxvt-utempter.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -17,11 +18,12 @@ BuildRequires:  /usr/bin/tic
 BuildRequires:  desktop-file-utils
 BuildRequires:  libX11-devel
 BuildRequires:  libXft-devel
-BuildRequires:  libXpm-devel
 BuildRequires:  libXrender-devel
 BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  perl-devel
+BuildRequires:  libAfterImage-devel
+#BuildRequires:  libutempter-devel
 
 %description
 rxvt-unicode is a clone of the well known terminal emulator rxvt, modified to
@@ -32,20 +34,21 @@ Xft fonts.
 
 %prep
 %setup -q
-
+#%patch0
+#autoreconf -f
 
 %build
-%configure --enable-xft --enable-font-styles --enable-utmp --enable-wtmp \
-  --enable-lastlog --enable-transparency --enable-tinting --enable-fading \
-  --enable-menubar --enable-rxvt-scroll --enable-xterm-scroll \
-  --enable-plain-scroll --enable-half-shadow --enable-xgetdefault \
-  --enable-24bit --enable-keepscrolling --enable-selectionscrolling \
+#  --enable-utempter --disable-utmp --disable-wtmp --disable-lastlog \
+%configure --enable-xft --enable-font-styles --enable-afterimage \
+  --enable-utmp --enable-wtmp --enable-lastlog \
+  --enable-transparency --enable-fading \
+  --enable-rxvt-scroll --enable-xterm-scroll --enable-next-scroll \
+  --enable-plain-scroll \
+  --enable-keepscrolling --enable-selectionscrolling \
   --enable-mousewheel --enable-slipwheeling --enable-smart-resize \
-  --enable-pointer-blank --enable-xpm-background --enable-next-scroll \
-  --enable-xim --enable-linespace --with-save-lines=2000 --enable-resources \
-  --with-codesets=all --enable-combining --enable-iso14755 --enable-frills \
-  --with-xpm-includes=%{_includedir}/X11 \
-  --with-xpm-library=%{_libdir}
+  --enable-pointer-blank \
+  --enable-xim --enable-resources \
+  --with-codesets=all --enable-iso14755 --enable-frills
 
 make CFLAGS="${RPM_OPT_FLAGS}" %{?_smp_mflags}
 
@@ -71,6 +74,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Wed Dec 12 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 8.5a-2
+- remove utempter patch for now
+
+* Thu Nov 22 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 8.5a-1
+- version upgrade
+
+* Wed Nov 07 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 8.4-2
+- fix #368921 (Rxvt.backgroundPixmap needs libAfterImage support BR now)
+- add patch for utempter support
+
 * Sun Oct 28 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 8.4-1
 - version upgrade
