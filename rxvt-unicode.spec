@@ -1,5 +1,5 @@
 Name:           rxvt-unicode
-Version:        8.8
+Version:        8.9
 Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
@@ -74,6 +74,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Thu Dec 27 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 8.9-1
+- version upgrade
+
 * Mon Dec 17 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 8.8-1
 - version upgrade
