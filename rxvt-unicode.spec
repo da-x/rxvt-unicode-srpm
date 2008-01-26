@@ -1,14 +1,13 @@
 Name:           rxvt-unicode
-Version:        8.9
+Version:        9.0
 Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
 License:        GPLv2+
 URL:            http://software.schmorp.de/
-Source0:        http://dist.schmorp.de/%name/%name-%version.tar.bz2
+Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
 Source1:        rxvt-unicode.desktop
-#Patch0:         urxvt-utempter.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -23,7 +22,6 @@ BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  perl-devel
 BuildRequires:  libAfterImage-devel
-#BuildRequires:  libutempter-devel
 
 %description
 rxvt-unicode is a clone of the well known terminal emulator rxvt, modified to
@@ -34,11 +32,8 @@ Xft fonts.
 
 %prep
 %setup -q
-#%patch0
-#autoreconf -f
 
 %build
-#  --enable-utempter --disable-utmp --disable-wtmp --disable-lastlog \
 %configure --enable-xft --enable-font-styles --enable-afterimage \
   --enable-utmp --enable-wtmp --enable-lastlog \
   --enable-transparency --enable-fading \
@@ -74,6 +69,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Sat Jan 26 2008 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.0-1
+- version upgrade
+
 * Thu Dec 27 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 8.9-1
 - version upgrade
