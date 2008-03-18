@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.02
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -20,8 +20,9 @@ BuildRequires:  libXft-devel
 BuildRequires:  libXrender-devel
 BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
-BuildRequires:  perl-devel
+BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  libAfterImage-devel
+Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
 rxvt-unicode is a clone of the well known terminal emulator rxvt, modified to
@@ -69,6 +70,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Tue Mar 18 2008 Tom "spot" Callaway <tcallawa@redhat.com>
+- 9.02-2
+- add Requires for versioned perl (libperl.so)
+
 * Thu Feb 21 2008 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.02-1
 - version upgrade
