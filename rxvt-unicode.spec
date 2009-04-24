@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.06
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -8,6 +8,8 @@ License:        GPLv2+
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
 Source1:        rxvt-unicode.desktop
+# Sent to rxvt-unicode [AT] lists [DOT] schmorp [DOT] de on 2009/04/25
+Patch0:			rxvt-unicode-gcc44.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -33,6 +35,7 @@ Xft fonts.
 
 %prep
 %setup -q
+%patch0
 
 %build
 %configure --enable-xft --enable-font-styles --enable-afterimage \
@@ -70,6 +73,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Sat Apr 25 2009 Milos Jakubicek <xjakub@fi.muni.cz> - 9.06-3
+- Fix FTBFS: added rxvt-unicode-gcc44.patch
+
 * Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.06-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
