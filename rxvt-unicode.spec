@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.06
-Release:        5%{?dist}
+Version:        9.07
+Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -8,8 +8,6 @@ License:        GPLv2+
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
 Source1:        rxvt-unicode.desktop
-# Sent to rxvt-unicode [AT] lists [DOT] schmorp [DOT] de on 2009/04/25
-Patch0:			rxvt-unicode-gcc44.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -35,7 +33,6 @@ Xft fonts.
 
 %prep
 %setup -q
-%patch0
 
 %build
 %configure --enable-xft --enable-font-styles --enable-afterimage \
@@ -73,6 +70,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Thu Dec 31 2009 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.07-1
+- version upgrade
+
 * Mon Dec  7 2009 Stepan Kasal <skasal@redhat.com> - 9.06-5
 - rebuild against perl 5.10.1
 
