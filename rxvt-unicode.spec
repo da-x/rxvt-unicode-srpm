@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.07
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -70,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Wed Jun 02 2010 Marcela Maslanova <mmaslano@redhat.com> - 9.07-2
+- Mass rebuild with perl-5.12.0
+
 * Thu Dec 31 2009 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.07-1
 - version upgrade
