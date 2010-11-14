@@ -51,7 +51,7 @@ Xft fonts.
   --enable-unicode3 \
   --enable-pixbuf
 
-make CFLAGS="%{optflags}" %{?_smp_mflags}
+make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
