@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.07
-Release:        2%{?dist}
+Version:        9.09
+Release:        1%{?dist}
 Summary:        Rxvt-unicode is an unicode version of rxvt
 
 Group:          User Interface/X
@@ -8,6 +8,7 @@ License:        GPLv2+
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
 Source1:        rxvt-unicode.desktop
+Patch0:         rxvt-unicode-scroll-modupdown.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -22,6 +23,7 @@ BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  libAfterImage-devel
+BuildRequires:  gdk-pixbuf2-devel
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
@@ -33,33 +35,35 @@ Xft fonts.
 
 %prep
 %setup -q
+%patch0 -p1 -b .scroll-modupdown
 
 %build
 %configure --enable-xft --enable-font-styles --enable-afterimage \
   --enable-utmp --enable-wtmp --enable-lastlog \
   --enable-transparency --enable-fading \
   --enable-rxvt-scroll --enable-xterm-scroll --enable-next-scroll \
-  --enable-plain-scroll \
   --enable-keepscrolling --enable-selectionscrolling \
   --enable-mousewheel --enable-slipwheeling --enable-smart-resize \
   --enable-pointer-blank \
   --enable-xim --enable-resources \
-  --with-codesets=all --enable-iso14755 --enable-frills
+  --with-codesets=all --enable-iso14755 --enable-frills \
+  --enable-256-color \
+  --enable-unicode3 \
+  --enable-pixbuf
 
-make CFLAGS="${RPM_OPT_FLAGS}" %{?_smp_mflags}
+make CFLAGS="%{optflags}" %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+rm -rf %{buildroot}
+make install DESTDIR=%{buildroot}
 
 desktop-file-install \
   --vendor=fedora \
-  --dir=$RPM_BUILD_ROOT%{_datadir}/applications \
-  --add-category=X-Fedora \
+  --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE1}
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
@@ -70,6 +74,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/urxvt
 
 %changelog
+* Sun Nov 14 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.09-1
+- version upgrade (fixes #581373)
+- allow scrolling with mod+up/down (#510944)
+- fixup desktop file (#617519)
+- spec file cleanups
+
 * Wed Jun 02 2010 Marcela Maslanova <mmaslano@redhat.com> - 9.07-2
 - Mass rebuild with perl-5.12.0
 

@@ -4,5 +4,5 @@ Comment=a VT102 emulator for the X window system
 Exec=urxvt
 Terminal=false
 Type=Application
-Encoding=UTF-8
-Categories=Application;System;
+Icon=gnome-xterm
+Categories=System;TerminalEmulator;
