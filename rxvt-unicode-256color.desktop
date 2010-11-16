@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=rxvt-unicode
+Name=rxvt-unicode (256color)
 Comment=A VT102 emulator for the X window system
-Exec=urxvt
+Exec=urxvt256c
 Terminal=false
 Type=Application
 Icon=gnome-xterm

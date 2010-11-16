@@ -1,13 +1,16 @@
 Name:           rxvt-unicode
 Version:        9.09
-Release:        1%{?dist}
-Summary:        Rxvt-unicode is an unicode version of rxvt
+Release:        2%{?dist}
+Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
 License:        GPLv2+
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
 Source1:        rxvt-unicode.desktop
+Source2:        rxvt-unicode-ml.desktop
+Source3:        rxvt-unicode-256color.desktop
+Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -32,48 +35,282 @@ store text in Unicode (either UCS-2 or UCS-4) and to use locale-correct input
 and output. It also supports mixing multiple fonts at the same time, including
 Xft fonts.
 
+%package ml
+Summary:        Multi-language version of rxvt-unicode
+Group:          User Interface/X
+Requires:       %{name} = %{version}-%{release}
+
+%description ml
+Version of rxvt-unicode with enhanced multi-language support.
+
+%package 256color
+Summary:        256 color version of rxvt-unicode
+Group:          User Interface/X
+Requires:       %{name} = %{version}-%{release}
+
+%description 256color
+256 color version of rxvt-unicode
+
+%package 256color-ml
+Summary:        256 color multi-language version of rxvt-unicode
+Group:          User Interface/X
+Requires:       %{name} = %{version}-%{release}
+
+%description 256color-ml
+Version of rxvt-unicode with 256color and enhanced multi-language support.
 
 %prep
-%setup -q
+%setup -q -c %{name}-%{version}
+pushd %{name}-%{version}
 %patch0 -p1 -b .scroll-modupdown
+popd
+
+cp -r %{name}-%{version} %{name}-%{version}-ml
+cp -r %{name}-%{version} %{name}-%{version}-256color
+cp -r %{name}-%{version} %{name}-%{version}-256color-ml
 
 %build
-%configure --enable-xft --enable-font-styles --enable-afterimage \
-  --enable-utmp --enable-wtmp --enable-lastlog \
-  --enable-transparency --enable-fading \
-  --enable-rxvt-scroll --enable-xterm-scroll --enable-next-scroll \
-  --enable-keepscrolling --enable-selectionscrolling \
-  --enable-mousewheel --enable-slipwheeling --enable-smart-resize \
-  --enable-pointer-blank \
-  --enable-xim --enable-resources \
-  --with-codesets=all --enable-iso14755 --enable-frills \
-  --enable-256-color \
-  --enable-unicode3 \
-  --enable-pixbuf
+# standard version
+pushd %{name}-%{version}
+%configure \
+ --enable-keepscrolling \
+ --enable-selectionscrolling \
+ --enable-pointer-blank \
+ --enable-utmp \
+ --enable-wtmp \
+ --enable-lastlog \
+ --enable-xft \
+ --enable-font-styles \
+ --enable-afterimage \
+%if 0%{?fedora} > 13
+ --enable-pixbuf \
+%endif
+ --enable-transparency \
+ --enable-fading \
+ --enable-rxvt-scroll \
+ --enable-next-scroll \
+ --enable-xterm-scroll \
+ --enable-perl \
+ --enable-mousewheel \
+ --enable-slipwheeling \
+ --enable-smart-resize \
+ --disable-iso14755 \
+ --with-term=rxvt-unicode
 
 make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+popd
+
+# multi-language version
+pushd %{name}-%{version}-ml
+%configure \
+ --enable-keepscrolling \
+ --enable-selectionscrolling \
+ --enable-pointer-blank \
+ --enable-utmp \
+ --enable-wtmp \
+ --enable-lastlog \
+ --enable-unicode3 \
+ --enable-combining \
+ --enable-xft \
+ --enable-font-styles \
+ --enable-afterimage \
+%if 0%{?fedora} > 13
+ --enable-pixbuf \
+%endif
+ --enable-transparency \
+ --enable-fading \
+ --enable-rxvt-scroll \
+ --enable-next-scroll \
+ --enable-xterm-scroll \
+ --enable-perl \
+ --enable-xim \
+ --enable-iso14755 \
+ --with-codesets=all \
+ --enable-frills \
+ --enable-mousewheel \
+ --enable-slipwheeling \
+ --enable-smart-resize \
+ --with-term=rxvt-unicode \
+ --with-name=urxvt-ml
+
+make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+popd
+
+# 256 color version
+pushd %{name}-%{version}-256color
+%configure \
+ --enable-keepscrolling \
+ --enable-selectionscrolling \
+ --enable-pointer-blank \
+ --enable-utmp \
+ --enable-wtmp \
+ --enable-lastlog \
+ --enable-xft \
+ --enable-font-styles \
+ --enable-afterimage \
+%if 0%{?fedora} > 13
+ --enable-pixbuf \
+%endif
+ --enable-transparency \
+ --enable-fading \
+ --enable-rxvt-scroll \
+ --enable-next-scroll \
+ --enable-xterm-scroll \
+ --enable-perl \
+ --enable-mousewheel \
+ --enable-slipwheeling \
+ --enable-smart-resize \
+ --disable-iso14755 \
+ --with-term=rxvt-unicode-256color \
+ --with-name=urxvt256c \
+ --enable-256-color
+
+make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+popd
+
+# multi-language version with 256color
+pushd %{name}-%{version}-256color-ml
+%configure \
+ --enable-keepscrolling \
+ --enable-selectionscrolling \
+ --enable-pointer-blank \
+ --enable-utmp \
+ --enable-wtmp \
+ --enable-lastlog \
+ --enable-unicode3 \
+ --enable-combining \
+ --enable-xft \
+ --enable-font-styles \
+ --enable-afterimage \
+%if 0%{?fedora} > 13
+ --enable-pixbuf \
+%endif
+ --enable-transparency \
+ --enable-fading \
+ --enable-rxvt-scroll \
+ --enable-next-scroll \
+ --enable-xterm-scroll \
+ --enable-perl \
+ --enable-xim \
+ --enable-iso14755 \
+ --with-codesets=all \
+ --enable-frills \
+ --enable-mousewheel \
+ --enable-slipwheeling \
+ --enable-smart-resize \
+ --with-term=rxvt-unicode-256color \
+ --with-name=urxvt256c-ml \
+ --enable-256-color
+
+make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+popd
 
 %install
 rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
 
+
+for ver in \
+ %{name}-%{version} %{name}-%{version}-ml \
+ %{name}-%{version}-256color %{name}-%{version}-256color-ml;
+do
+    pushd ${ver}
+    make install DESTDIR=%{buildroot}
+    popd
+done;
+
+# create links for man pages
+pushd %{buildroot}%{_mandir}/man1
+for ver in -ml 256c 256c-ml;
+do
+    ln -s urxvt.1.gz urxvt${ver}.1.gz
+    ln -s urxvtc.1.gz urxvt${ver}c.1.gz
+    ln -s urxvtd.1.gz urxvt${ver}d.1.gz
+done;
+popd
+
+# install desktop files
 desktop-file-install \
   --vendor=fedora \
   --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE1}
+
+desktop-file-install \
+  --vendor=fedora \
+  --dir=%{buildroot}%{_datadir}/applications \
+  %{SOURCE2}
+
+desktop-file-install \
+  --vendor=fedora \
+  --dir=%{buildroot}%{_datadir}/applications \
+  %{SOURCE3}
+
+desktop-file-install \
+  --vendor=fedora \
+  --dir=%{buildroot}%{_datadir}/applications \
+  %{SOURCE4}
 
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc README.FAQ INSTALL doc/README.xvt doc/etc doc/changes.txt COPYING
-%{_bindir}/*
-%{_mandir}/man*/*
-%{_datadir}/applications/*
+%doc %{name}-%{version}/README.FAQ
+%doc %{name}-%{version}/INSTALL
+%doc %{name}-%{version}/doc/README.xvt
+%doc %{name}-%{version}/doc/etc
+%doc %{name}-%{version}/doc/changes.txt
+%doc %{name}-%{version}/COPYING
+%{_bindir}/urxvt
+%{_bindir}/urxvtc
+%{_bindir}/urxvtd
+%{_mandir}/man1/urxvt.1*
+%{_mandir}/man1/urxvtc.1*
+%{_mandir}/man1/urxvtd.1*
+%{_mandir}/man3/*
+%{_mandir}/man7/*
+%{_datadir}/applications/*rxvt-unicode.desktop
 %{_libdir}/urxvt
 
+%files ml
+%defattr(-,root,root,-)
+%{_bindir}/urxvt-ml
+%{_bindir}/urxvt-mlc
+%{_bindir}/urxvt-mld
+%{_mandir}/man1/urxvt-ml.1*
+%{_mandir}/man1/urxvt-mlc.1*
+%{_mandir}/man1/urxvt-mld.1*
+%{_datadir}/applications/*rxvt-unicode-ml.desktop
+
+%files 256color
+%defattr(-,root,root,-)
+%{_bindir}/urxvt256c
+%{_bindir}/urxvt256cc
+%{_bindir}/urxvt256cd
+%{_mandir}/man1/urxvt256c.1*
+%{_mandir}/man1/urxvt256cc.1*
+%{_mandir}/man1/urxvt256cd.1*
+%{_datadir}/applications/*rxvt-unicode-256color.desktop
+
+
+%files 256color-ml
+%defattr(-,root,root,-)
+%{_bindir}/urxvt256c-ml
+%{_bindir}/urxvt256c-mlc
+%{_bindir}/urxvt256c-mld
+%{_mandir}/man1/urxvt256c-ml.1*
+%{_mandir}/man1/urxvt256c-mlc.1*
+%{_mandir}/man1/urxvt256c-mld.1*
+%{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
+
 %changelog
+* Mon Nov 15 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.09-2
+- Rework to provide four versions:
+- standard (rxvt-unicode)
+- multi-language support (rxvt-unicode-ml)
+- 256color version (rxvt-unicode-256color)
+- 256color multi-language (rxvt-unicode-256color-ml)
+
 * Sun Nov 14 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.09-1
 - version upgrade (fixes #581373)
