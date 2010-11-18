@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.09
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -94,6 +94,7 @@ pushd %{name}-%{version}
  --enable-mousewheel \
  --enable-slipwheeling \
  --enable-smart-resize \
+ --enable-frills \
  --disable-iso14755 \
  --with-term=rxvt-unicode
 
@@ -160,6 +161,7 @@ pushd %{name}-%{version}-256color
  --enable-mousewheel \
  --enable-slipwheeling \
  --enable-smart-resize \
+ --enable-frills \
  --disable-iso14755 \
  --with-term=rxvt-unicode-256color \
  --with-name=urxvt256c \
@@ -303,6 +305,12 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Thu Nov 18 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.09-3
+- re-add frills build option for standard versions
+- bind scrolling actions to crtl+up/down/pgup/pgdown as shift will break the
+  tabbing support
+
 * Mon Nov 15 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.09-2
 - Rework to provide four versions:
