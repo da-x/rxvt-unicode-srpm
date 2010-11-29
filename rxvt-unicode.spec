@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.09
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -17,7 +17,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
 BuildRequires:  glib2-devel
-BuildRequires:  /usr/bin/tic
+BuildRequires:  ncurses ncurses-base ncurses-devel
 BuildRequires:  desktop-file-utils
 BuildRequires:  libX11-devel
 BuildRequires:  libXft-devel
@@ -28,6 +28,7 @@ BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  libAfterImage-devel
 BuildRequires:  gdk-pixbuf2-devel
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Requires:       ncurses-base
 
 %description
 rxvt-unicode is a clone of the well known terminal emulator rxvt, modified to
@@ -251,6 +252,11 @@ desktop-file-install \
   --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE4}
 
+# install terminfo for 256color
+mkdir -p %{buildroot}%{_datadir}/terminfo/r/
+tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
+ %{name}-%{version}/doc/etc/rxvt-unicode.terminfo
+
 %clean
 rm -rf %{buildroot}
 
@@ -272,6 +278,7 @@ rm -rf %{buildroot}
 %{_mandir}/man7/*
 %{_datadir}/applications/*rxvt-unicode.desktop
 %{_libdir}/urxvt
+%{_datadir}/terminfo/r/rxvt-unicode-256color
 
 %files ml
 %defattr(-,root,root,-)
@@ -305,6 +312,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Mon Nov 29 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.09-4
+- include terminfo for 256color version for now
+
 * Thu Nov 18 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.09-3
 - re-add frills build option for standard versions
