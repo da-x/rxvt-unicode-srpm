@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.09
-Release:        4%{?dist}
+Version:        9.10
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -312,6 +312,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sun Dec 19 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.10-1
+- version upgrade
+
 * Mon Nov 29 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.09-4
 - include terminfo for 256color version for now
