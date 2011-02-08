@@ -1,17 +1,6 @@
 diff -up rxvt-unicode-9.09/src/feature.h.scroll-modupdown rxvt-unicode-9.09/src/feature.h
 --- rxvt-unicode-9.09/src/feature.h.scroll-modupdown	2009-05-30 10:48:11.000000000 +0200
 +++ rxvt-unicode-9.09/src/feature.h	2010-11-18 10:03:55.000000000 +0100
-@@ -122,8 +122,8 @@
-  * Modifier/s to use to allow up/down arrows and Prior/Next keys
-  * to scroll single or page-fulls
-  */
--#define SCROLL_ON_SHIFT
--/* #define SCROLL_ON_CTRL */
-+/* #define SCROLL_ON_SHIFT */
-+#define SCROLL_ON_CTRL
- /* #define SCROLL_ON_META */
- 
- /*
 @@ -132,8 +132,8 @@
   * SCROLL_ON_* defines above.).
   * Also for modifier+Home/End keys to move to top/bottom

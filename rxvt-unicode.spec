@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -12,6 +12,7 @@ Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
+Patch1:         rxvt-unicode-tabbed-newterm.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -27,6 +28,9 @@ BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  libAfterImage-devel
 BuildRequires:  gdk-pixbuf2-devel
+%if 0%{?fedora} >= 15
+BuildRequires:  libev-source
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       ncurses-base
 
@@ -64,11 +68,26 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 %setup -q -c %{name}-%{version}
 pushd %{name}-%{version}
 %patch0 -p1 -b .scroll-modupdown
+%patch1 -p1 -b .tabbed-newterm
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
 cp -r %{name}-%{version} %{name}-%{version}-256color
 cp -r %{name}-%{version} %{name}-%{version}-256color-ml
+
+%if 0%{?fedora} >= 15
+rm -rf %{name}-%{version}/libev
+ln -s %{_datadir}/libev-source %{name}-%{version}/libev
+
+rm -rf %{name}-%{version}-ml/libev
+ln -s %{_datadir}/libev-source %{name}-%{version}-ml/libev
+
+rm -rf %{name}-%{version}-256color/libev
+ln -s %{_datadir}/libev-source %{name}-%{version}-256color/libev
+
+rm -rf %{name}-%{version}-256color-ml/libev
+ln -s %{_datadir}/libev-source %{name}-%{version}-256color-ml/libev
+%endif
 
 %build
 # standard version
@@ -312,6 +331,12 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Tue Feb 08 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.10-2
+- switch back to shift scroll (#667980)
+- open new tab on Ctrl+t
+- build with libev-source on f15+ (#672396)
+
 * Sun Dec 19 2010 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.10-1
 - version upgrade
