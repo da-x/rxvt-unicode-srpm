@@ -27,7 +27,9 @@ BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
 BuildRequires:  libAfterImage-devel
+%if 0%{?fedora} >= 13
 BuildRequires:  gdk-pixbuf2-devel
+%endif
 %if 0%{?fedora} >= 15
 BuildRequires:  libev-source
 %endif
