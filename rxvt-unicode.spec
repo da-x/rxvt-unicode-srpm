@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -333,6 +333,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Tue Feb 08 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.10-2
 - switch back to shift scroll (#667980)
