@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.10
-Release:        4%{?dist}
+Version:        9.12
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -333,6 +333,11 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Mon Jul 04 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.12-1
+- version upgrade
+- fix key definition (rhbz#718506)
+
 * Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 9.10-4
 - Perl mass rebuild
 
