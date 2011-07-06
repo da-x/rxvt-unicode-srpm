@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -13,6 +13,9 @@ Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
 Patch1:         rxvt-unicode-tabbed-newterm.patch
+# upstream fix for rhbz#711137
+# http://cvs.schmorp.de/rxvt-unicode/src/screen.C?hideattic=1&r1=1.384&r2=1.385&sortby=date&view=patch
+Patch2:         rxvt-unicode-screen.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -71,6 +74,9 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 pushd %{name}-%{version}
 %patch0 -p1 -b .scroll-modupdown
 %patch1 -p1 -b .tabbed-newterm
+pushd src
+%patch2 -b .screen
+popd
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -333,6 +339,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Wed Jul 06 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.12-2
+- fix segfault (rhbz#711137)
+
 * Mon Jul 04 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.12-1
 - version upgrade
