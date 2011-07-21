@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.12
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -339,6 +339,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Thu Jul 21 2011 Petr Sabata <contyk@redhat.com> - 9.12-4
+- Perl mass rebuild
+
 * Wed Jul 20 2011 Petr Sabata <contyk@redhat.com> - 9.12-3
 - Perl mass rebuild
 
