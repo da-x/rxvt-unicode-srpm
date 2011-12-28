@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.12
-Release:        5%{?dist}
+Version:        9.14
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -13,9 +13,6 @@ Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
 Patch1:         rxvt-unicode-tabbed-newterm.patch
-# upstream fix for rhbz#711137
-# http://cvs.schmorp.de/rxvt-unicode/src/screen.C?hideattic=1&r1=1.384&r2=1.385&sortby=date&view=patch
-Patch2:         rxvt-unicode-screen.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -29,7 +26,6 @@ BuildRequires:  libXrender-devel
 BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
 BuildRequires:  perl-devel, perl(ExtUtils::Embed)
-BuildRequires:  libAfterImage-devel
 %if 0%{?fedora} > 13 || !0%{?rhel}
 BuildRequires:  gdk-pixbuf2-devel
 %endif
@@ -74,9 +70,6 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 pushd %{name}-%{version}
 %patch0 -p1 -b .scroll-modupdown
 %patch1 -p1 -b .tabbed-newterm
-pushd src
-%patch2 -b .screen
-popd
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -109,7 +102,7 @@ pushd %{name}-%{version}
  --enable-lastlog \
  --enable-xft \
  --enable-font-styles \
- --enable-afterimage \
+ --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -142,7 +135,7 @@ pushd %{name}-%{version}-ml
  --enable-combining \
  --enable-xft \
  --enable-font-styles \
- --enable-afterimage \
+ --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -176,7 +169,7 @@ pushd %{name}-%{version}-256color
  --enable-lastlog \
  --enable-xft \
  --enable-font-styles \
- --enable-afterimage \
+ --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -211,7 +204,7 @@ pushd %{name}-%{version}-256color-ml
  --enable-combining \
  --enable-xft \
  --enable-font-styles \
- --enable-afterimage \
+ --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -339,6 +332,12 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Wed Dec 28 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.14-1
+- version ugprade
+- drop screen patch (upstream)
+- disable libAfterImage as it is deprecated
+
 * Fri Nov 18 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.12-5
 - use icon from fd.org standard (rhbz#754939)
