@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -332,6 +332,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Wed Dec 28 2011 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.14-1
 - version ugprade
