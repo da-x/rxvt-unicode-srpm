@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.15
-Release:        3%{?dist}
+Version:        9.16
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -102,7 +102,6 @@ pushd %{name}-%{version}
  --enable-lastlog \
  --enable-xft \
  --enable-font-styles \
- --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -135,7 +134,6 @@ pushd %{name}-%{version}-ml
  --enable-combining \
  --enable-xft \
  --enable-font-styles \
- --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -169,7 +167,6 @@ pushd %{name}-%{version}-256color
  --enable-lastlog \
  --enable-xft \
  --enable-font-styles \
- --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -204,7 +201,6 @@ pushd %{name}-%{version}-256color-ml
  --enable-combining \
  --enable-xft \
  --enable-font-styles \
- --disable-afterimage \
 %if 0%{?fedora} > 13
  --enable-pixbuf \
 %endif
@@ -294,10 +290,37 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt.1*
 %{_mandir}/man1/urxvtc.1*
 %{_mandir}/man1/urxvtd.1*
-%{_mandir}/man3/*
-%{_mandir}/man7/*
+%{_mandir}/man1/urxvt-background.1*
+%{_mandir}/man1/urxvt-bell-command.1*
+%{_mandir}/man1/urxvt-block-graphics-to-ascii.1*
+%{_mandir}/man1/urxvt-clipboard-osc.1*
+%{_mandir}/man1/urxvt-confirm-paste.1*
+%{_mandir}/man1/urxvt-digital-clock.1*
+%{_mandir}/man1/urxvt-example-refresh-hooks.1*
+%{_mandir}/man1/urxvt-extensions.1*
+%{_mandir}/man1/urxvt-keysym-list.1*
+%{_mandir}/man1/urxvt-kuake.1*
+%exclude %{_mandir}/man1/urxvt-macosx-clipboard-native.1*
+%exclude %{_mandir}/man1/urxvt-macosx-clipboard.1*
+%{_mandir}/man1/urxvt-matcher.1*
+%{_mandir}/man1/urxvt-option-popup.1*
+%{_mandir}/man1/urxvt-overlay-osc.1*
+%{_mandir}/man1/urxvt-readline.1*
+%{_mandir}/man1/urxvt-remote-clipboard.1*
+%{_mandir}/man1/urxvt-searchable-scrollback.1*
+%{_mandir}/man1/urxvt-selection-autotransform.1*
+%{_mandir}/man1/urxvt-selection-pastebin.1*
+%{_mandir}/man1/urxvt-selection-popup.1*
+%{_mandir}/man1/urxvt-selection.1*
+%{_mandir}/man1/urxvt-tabbed.1*
+%{_mandir}/man1/urxvt-tabbed.tabbed-newterm.1*
+%{_mandir}/man1/urxvt-xim-onthespot.1*
+%{_mandir}/man3/urxvtperl.3*
+%{_mandir}/man7/urxvt.7*
 %{_datadir}/applications/*rxvt-unicode.desktop
 %{_libdir}/urxvt
+%exclude %{_libdir}/urxvt/perl/macosx-clipboard
+%exclude %{_libdir}/urxvt/perl/macosx-clipboard-native
 %{_datadir}/terminfo/r/rxvt-unicode-256color
 
 %files ml
@@ -308,6 +331,33 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt-ml.1*
 %{_mandir}/man1/urxvt-mlc.1*
 %{_mandir}/man1/urxvt-mld.1*
+%{_mandir}/man1/urxvt-ml-background.1*
+%{_mandir}/man1/urxvt-ml-bell-command.1*
+%{_mandir}/man1/urxvt-ml-block-graphics-to-ascii.1*
+%{_mandir}/man1/urxvt-ml-clipboard-osc.1*
+%{_mandir}/man1/urxvt-ml-confirm-paste.1*
+%{_mandir}/man1/urxvt-ml-digital-clock.1*
+%{_mandir}/man1/urxvt-ml-example-refresh-hooks.1*
+%{_mandir}/man1/urxvt-ml-extensions.1*
+%{_mandir}/man1/urxvt-ml-keysym-list.1*
+%{_mandir}/man1/urxvt-ml-kuake.1*
+%exclude %{_mandir}/man1/urxvt-ml-macosx-clipboard-native.1*
+%exclude %{_mandir}/man1/urxvt-ml-macosx-clipboard.1*
+%{_mandir}/man1/urxvt-ml-matcher.1*
+%{_mandir}/man1/urxvt-ml-option-popup.1*
+%{_mandir}/man1/urxvt-ml-overlay-osc.1*
+%{_mandir}/man1/urxvt-ml-readline.1*
+%{_mandir}/man1/urxvt-ml-remote-clipboard.1*
+%{_mandir}/man1/urxvt-ml-searchable-scrollback.1*
+%{_mandir}/man1/urxvt-ml-selection-autotransform.1*
+%{_mandir}/man1/urxvt-ml-selection-pastebin.1*
+%{_mandir}/man1/urxvt-ml-selection-popup.1*
+%{_mandir}/man1/urxvt-ml-selection.1*
+%{_mandir}/man1/urxvt-ml-tabbed.1*
+%{_mandir}/man1/urxvt-ml-tabbed.tabbed-newterm.1*
+%{_mandir}/man1/urxvt-ml-xim-onthespot.1*
+%{_mandir}/man3/urxvt-mlperl.3*
+%{_mandir}/man7/urxvt-ml.7*
 %{_datadir}/applications/*rxvt-unicode-ml.desktop
 
 %files 256color
@@ -318,6 +368,33 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt256c.1*
 %{_mandir}/man1/urxvt256cc.1*
 %{_mandir}/man1/urxvt256cd.1*
+%{_mandir}/man1/urxvt256c-background.1*
+%{_mandir}/man1/urxvt256c-bell-command.1*
+%{_mandir}/man1/urxvt256c-block-graphics-to-ascii.1*
+%{_mandir}/man1/urxvt256c-clipboard-osc.1*
+%{_mandir}/man1/urxvt256c-confirm-paste.1*
+%{_mandir}/man1/urxvt256c-digital-clock.1*
+%{_mandir}/man1/urxvt256c-example-refresh-hooks.1*
+%{_mandir}/man1/urxvt256c-extensions.1*
+%{_mandir}/man1/urxvt256c-keysym-list.1*
+%{_mandir}/man1/urxvt256c-kuake.1*
+%exclude %{_mandir}/man1/urxvt256c-macosx-clipboard-native.1*
+%exclude %{_mandir}/man1/urxvt256c-macosx-clipboard.1*
+%{_mandir}/man1/urxvt256c-matcher.1*
+%{_mandir}/man1/urxvt256c-option-popup.1*
+%{_mandir}/man1/urxvt256c-overlay-osc.1*
+%{_mandir}/man1/urxvt256c-readline.1*
+%{_mandir}/man1/urxvt256c-remote-clipboard.1*
+%{_mandir}/man1/urxvt256c-searchable-scrollback.1*
+%{_mandir}/man1/urxvt256c-selection-autotransform.1*
+%{_mandir}/man1/urxvt256c-selection-pastebin.1*
+%{_mandir}/man1/urxvt256c-selection-popup.1*
+%{_mandir}/man1/urxvt256c-selection.1*
+%{_mandir}/man1/urxvt256c-tabbed.1*
+%{_mandir}/man1/urxvt256c-tabbed.tabbed-newterm.1*
+%{_mandir}/man1/urxvt256c-xim-onthespot.1*
+%{_mandir}/man3/urxvt256cperl.3*
+%{_mandir}/man7/urxvt256c.7*
 %{_datadir}/applications/*rxvt-unicode-256color.desktop
 
 
@@ -329,9 +406,41 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt256c-ml.1*
 %{_mandir}/man1/urxvt256c-mlc.1*
 %{_mandir}/man1/urxvt256c-mld.1*
+%{_mandir}/man1/urxvt256c-ml-background.1*
+%{_mandir}/man1/urxvt256c-ml-bell-command.1*
+%{_mandir}/man1/urxvt256c-ml-block-graphics-to-ascii.1*
+%{_mandir}/man1/urxvt256c-ml-clipboard-osc.1*
+%{_mandir}/man1/urxvt256c-ml-confirm-paste.1*
+%{_mandir}/man1/urxvt256c-ml-digital-clock.1*
+%{_mandir}/man1/urxvt256c-ml-example-refresh-hooks.1*
+%{_mandir}/man1/urxvt256c-ml-extensions.1*
+%{_mandir}/man1/urxvt256c-ml-keysym-list.1*
+%{_mandir}/man1/urxvt256c-ml-kuake.1*
+%exclude %{_mandir}/man1/urxvt256c-ml-macosx-clipboard-native.1*
+%exclude %{_mandir}/man1/urxvt256c-ml-macosx-clipboard.1*
+%{_mandir}/man1/urxvt256c-ml-matcher.1*
+%{_mandir}/man1/urxvt256c-ml-option-popup.1*
+%{_mandir}/man1/urxvt256c-ml-overlay-osc.1*
+%{_mandir}/man1/urxvt256c-ml-readline.1*
+%{_mandir}/man1/urxvt256c-ml-remote-clipboard.1*
+%{_mandir}/man1/urxvt256c-ml-searchable-scrollback.1*
+%{_mandir}/man1/urxvt256c-ml-selection-autotransform.1*
+%{_mandir}/man1/urxvt256c-ml-selection-pastebin.1*
+%{_mandir}/man1/urxvt256c-ml-selection-popup.1*
+%{_mandir}/man1/urxvt256c-ml-selection.1*
+%{_mandir}/man1/urxvt256c-ml-tabbed.1*
+%{_mandir}/man1/urxvt256c-ml-tabbed.tabbed-newterm.1*
+%{_mandir}/man1/urxvt256c-ml-xim-onthespot.1*
+%{_mandir}/man3/urxvt256c-mlperl.3*
+%{_mandir}/man7/urxvt256c-ml.7*
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sun Dec 30 2012 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.16-1
+- version upgrade
+- cleanup manpages
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.15-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
