@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.16
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -249,22 +249,30 @@ popd
 
 # install desktop files
 desktop-file-install \
+%if (0%{?fedora} && 0%{?fedora} < 19) || (0%{?rhel} && 0%{?rhel} < 7)
   --vendor=fedora \
+%endif
   --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE1}
 
 desktop-file-install \
+%if (0%{?fedora} && 0%{?fedora} < 19) || (0%{?rhel} && 0%{?rhel} < 7)
   --vendor=fedora \
+%endif
   --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE2}
 
 desktop-file-install \
+%if (0%{?fedora} && 0%{?fedora} < 19) || (0%{?rhel} && 0%{?rhel} < 7)
   --vendor=fedora \
+%endif
   --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE3}
 
 desktop-file-install \
+%if (0%{?fedora} && 0%{?fedora} < 19) || (0%{?rhel} && 0%{?rhel} < 7)
   --vendor=fedora \
+%endif
   --dir=%{buildroot}%{_datadir}/applications \
   %{SOURCE4}
 
@@ -436,6 +444,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Mon Feb 25 2013 Toshio Kuratomi <toshio@fedoraproject.org> - 9.16-3
+- Remove vendor from desktop files for F19+ https://fedorahosted.org/fesco/ticket/1077
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.16-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
