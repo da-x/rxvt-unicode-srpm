@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.16
-Release:        3%{?dist}
+Version:        9.17
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -444,6 +444,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Wed Mar 20 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.17-1
+- version upgrade
+
 * Mon Feb 25 2013 Toshio Kuratomi <toshio@fedoraproject.org> - 9.16-3
 - Remove vendor from desktop files for F19+ https://fedorahosted.org/fesco/ticket/1077
 
