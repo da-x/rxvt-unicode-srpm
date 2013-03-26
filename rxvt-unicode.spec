@@ -1,5 +1,5 @@
 Name:           rxvt-unicode
-Version:        9.17
+Version:        9.18
 Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
@@ -444,6 +444,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Mon Mar 26 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.18-1
+- version upgrade
+
 * Wed Mar 20 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.17-1
 - version upgrade
