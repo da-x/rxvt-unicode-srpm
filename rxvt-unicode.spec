@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.18
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -13,6 +13,7 @@ Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
 Patch1:         rxvt-unicode-tabbed-newterm.patch
+Patch2:         rxvt-unicode-xsubpp.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -70,6 +71,7 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 pushd %{name}-%{version}
 %patch0 -p1 -b .scroll-modupdown
 %patch1 -p1 -b .tabbed-newterm
+%patch2 -p1 -b .xsubpp
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -444,13 +446,16 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sun Aug 18 2013 Paul Howarth <paul@city-fan.org> - 9.18-4
+- fix xsubpp path leading to FTBFS (#993374)
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.18-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
 * Wed Jul 17 2013 Petr Pisar <ppisar@redhat.com> - 9.18-2
 - Perl 5.18 rebuild
 
-* Mon Mar 26 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+* Tue Mar 26 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.18-1
 - version upgrade
 
