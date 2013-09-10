@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.18
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -12,8 +12,10 @@ Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
-Patch1:         rxvt-unicode-tabbed-newterm.patch
-Patch2:         rxvt-unicode-xsubpp.patch
+# cvs revision 1.36
+Patch1:         rxvt-unicode-tabbed-cvs.patch
+Patch2:         rxvt-unicode-tabbed-newterm.patch
+Patch3:         rxvt-unicode-xsubpp.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -69,9 +71,12 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 %prep
 %setup -q -c %{name}-%{version}
 pushd %{name}-%{version}
+
 %patch0 -p1 -b .scroll-modupdown
-%patch1 -p1 -b .tabbed-newterm
-%patch2 -p1 -b .xsubpp
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1 -b .xsubpp
+rm src/perl/tabbed.orig
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -323,7 +328,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt-selection-popup.1*
 %{_mandir}/man1/urxvt-selection.1*
 %{_mandir}/man1/urxvt-tabbed.1*
-%{_mandir}/man1/urxvt-tabbed.tabbed-newterm.1*
 %{_mandir}/man1/urxvt-xim-onthespot.1*
 %{_mandir}/man3/urxvtperl.3*
 %{_mandir}/man7/urxvt.7*
@@ -364,7 +368,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt-ml-selection-popup.1*
 %{_mandir}/man1/urxvt-ml-selection.1*
 %{_mandir}/man1/urxvt-ml-tabbed.1*
-%{_mandir}/man1/urxvt-ml-tabbed.tabbed-newterm.1*
 %{_mandir}/man1/urxvt-ml-xim-onthespot.1*
 %{_mandir}/man3/urxvt-mlperl.3*
 %{_mandir}/man7/urxvt-ml.7*
@@ -401,7 +404,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt256c-selection-popup.1*
 %{_mandir}/man1/urxvt256c-selection.1*
 %{_mandir}/man1/urxvt256c-tabbed.1*
-%{_mandir}/man1/urxvt256c-tabbed.tabbed-newterm.1*
 %{_mandir}/man1/urxvt256c-xim-onthespot.1*
 %{_mandir}/man3/urxvt256cperl.3*
 %{_mandir}/man7/urxvt256c.7*
@@ -439,13 +441,16 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt256c-ml-selection-popup.1*
 %{_mandir}/man1/urxvt256c-ml-selection.1*
 %{_mandir}/man1/urxvt256c-ml-tabbed.1*
-%{_mandir}/man1/urxvt256c-ml-tabbed.tabbed-newterm.1*
 %{_mandir}/man1/urxvt256c-ml-xim-onthespot.1*
 %{_mandir}/man3/urxvt256c-mlperl.3*
 %{_mandir}/man7/urxvt256c-ml.7*
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Tue Sep 10 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.18-5
+- fix tabbed extension
+
 * Sun Aug 18 2013 Paul Howarth <paul@city-fan.org> - 9.18-4
 - fix xsubpp path leading to FTBFS (#993374)
 
