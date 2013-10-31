@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.18
-Release:        5%{?dist}
+Version:        9.19
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -12,10 +12,8 @@ Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-scroll-modupdown.patch
-# cvs revision 1.36
-Patch1:         rxvt-unicode-tabbed-cvs.patch
-Patch2:         rxvt-unicode-tabbed-newterm.patch
-Patch3:         rxvt-unicode-xsubpp.patch
+Patch1:         rxvt-unicode-tabbed-newterm.patch
+Patch2:         rxvt-unicode-xsubpp.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -74,8 +72,7 @@ pushd %{name}-%{version}
 
 %patch0 -p1 -b .scroll-modupdown
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1 -b .xsubpp
+%patch2 -p1 -b .xsubpp
 rm src/perl/tabbed.orig
 popd
 
@@ -447,6 +444,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Thu Oct 31 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
+- 9.19-1
+- version upgrade
+
 * Tue Sep 10 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.18-5
 - fix tabbed extension
