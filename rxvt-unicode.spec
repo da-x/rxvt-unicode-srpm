@@ -1,5 +1,5 @@
 Name:           rxvt-unicode
-Version:        9.19
+Version:        9.20
 Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
@@ -323,6 +323,7 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt-selection-autotransform.1*
 %{_mandir}/man1/urxvt-selection-pastebin.1*
 %{_mandir}/man1/urxvt-selection-popup.1*
+%{_mandir}/man1/urxvt-selection-to-clipboard.1*
 %{_mandir}/man1/urxvt-selection.1*
 %{_mandir}/man1/urxvt-tabbed.1*
 %{_mandir}/man1/urxvt-xim-onthespot.1*
@@ -363,6 +364,7 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt-ml-selection-autotransform.1*
 %{_mandir}/man1/urxvt-ml-selection-pastebin.1*
 %{_mandir}/man1/urxvt-ml-selection-popup.1*
+%{_mandir}/man1/urxvt-ml-selection-to-clipboard.1*
 %{_mandir}/man1/urxvt-ml-selection.1*
 %{_mandir}/man1/urxvt-ml-tabbed.1*
 %{_mandir}/man1/urxvt-ml-xim-onthespot.1*
@@ -399,6 +401,7 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt256c-selection-autotransform.1*
 %{_mandir}/man1/urxvt256c-selection-pastebin.1*
 %{_mandir}/man1/urxvt256c-selection-popup.1*
+%{_mandir}/man1/urxvt256c-selection-to-clipboard.1*
 %{_mandir}/man1/urxvt256c-selection.1*
 %{_mandir}/man1/urxvt256c-tabbed.1*
 %{_mandir}/man1/urxvt256c-xim-onthespot.1*
@@ -436,6 +439,7 @@ rm -rf %{buildroot}
 %{_mandir}/man1/urxvt256c-ml-selection-autotransform.1*
 %{_mandir}/man1/urxvt256c-ml-selection-pastebin.1*
 %{_mandir}/man1/urxvt256c-ml-selection-popup.1*
+%{_mandir}/man1/urxvt256c-ml-selection-to-clipboard.1*
 %{_mandir}/man1/urxvt256c-ml-selection.1*
 %{_mandir}/man1/urxvt256c-ml-tabbed.1*
 %{_mandir}/man1/urxvt256c-ml-xim-onthespot.1*
@@ -444,6 +448,11 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Thu May 01 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 9.20-1
+- update to upstream release 9.20, which includes a fix for security bug
+  CVE-2014-3121 (#1093287, #1093288, #1093289)
+- include man pages for new extension (selection-to-clipboard)
+
 * Thu Oct 31 2013 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de>
 - 9.19-1
 - version upgrade
