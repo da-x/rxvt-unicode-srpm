@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.20
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -11,9 +11,7 @@ Source1:        rxvt-unicode.desktop
 Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
-Patch0:         rxvt-unicode-scroll-modupdown.patch
-Patch1:         rxvt-unicode-tabbed-newterm.patch
-Patch2:         rxvt-unicode-xsubpp.patch
+Patch0:         rxvt-unicode-9.20-Fix-hard-coded-wrong-path-to-xsubpp.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  fontconfig-devel
@@ -69,11 +67,7 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 %prep
 %setup -q -c %{name}-%{version}
 pushd %{name}-%{version}
-
-%patch0 -p1 -b .scroll-modupdown
-%patch1 -p1
-%patch2 -p1 -b .xsubpp
-rm src/perl/tabbed.orig
+%patch0 -p1
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -409,7 +403,6 @@ rm -rf %{buildroot}
 %{_mandir}/man7/urxvt256c.7*
 %{_datadir}/applications/*rxvt-unicode-256color.desktop
 
-
 %files 256color-ml
 %defattr(-,root,root,-)
 %{_bindir}/urxvt256c-ml
@@ -448,6 +441,15 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Tue May 13 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 9.20-2
+- There is no need for the patches below, as they change the behavior of our
+  package and break the principle of least astonishment.
+- Remove Fedora-specific patch to scroll up/down one line. Any users wanting
+  this behavior can create their own key bindings.
+- Remove Fedora-specific patch to open new tabs with Control-t. Any users
+  wanting this behavior can create their own key bindings.
+- The popular 'tabbed' extension can now work properly (#1096791).
+
 * Thu May 01 2014 Jamie Nguyen <jamielinux@fedoraproject.org> - 9.20-1
 - update to upstream release 9.20, which includes a fix for security bug
   CVE-2014-3121 (#1093287, #1093288, #1093289)
