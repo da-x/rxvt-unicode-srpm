@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.20
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -12,7 +12,7 @@ Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-9.20-Fix-hard-coded-wrong-path-to-xsubpp.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Patch1:		rxvt-unicode-0001-Prefer-XDG_RUNTIME_DIR-over-the-HOME.patch
 
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
@@ -68,6 +68,7 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 %setup -q -c %{name}-%{version}
 pushd %{name}-%{version}
 %patch0 -p1
+%patch1 -p1 -b .runtime_dir
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -223,9 +224,6 @@ make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
 popd
 
 %install
-rm -rf %{buildroot}
-
-
 for ver in \
  %{name}-%{version} %{name}-%{version}-ml \
  %{name}-%{version}-256color %{name}-%{version}-256color-ml;
@@ -279,11 +277,8 @@ mkdir -p %{buildroot}%{_datadir}/terminfo/r/
 tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
  %{name}-%{version}/doc/etc/rxvt-unicode.terminfo
 
-%clean
-rm -rf %{buildroot}
 
 %files
-%defattr(-,root,root,-)
 %doc %{name}-%{version}/README.FAQ
 %doc %{name}-%{version}/INSTALL
 %doc %{name}-%{version}/doc/README.xvt
@@ -330,7 +325,6 @@ rm -rf %{buildroot}
 %{_datadir}/terminfo/r/rxvt-unicode-256color
 
 %files ml
-%defattr(-,root,root,-)
 %{_bindir}/urxvt-ml
 %{_bindir}/urxvt-mlc
 %{_bindir}/urxvt-mld
@@ -367,7 +361,6 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-ml.desktop
 
 %files 256color
-%defattr(-,root,root,-)
 %{_bindir}/urxvt256c
 %{_bindir}/urxvt256cc
 %{_bindir}/urxvt256cd
@@ -404,7 +397,6 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color.desktop
 
 %files 256color-ml
-%defattr(-,root,root,-)
 %{_bindir}/urxvt256c-ml
 %{_bindir}/urxvt256c-mlc
 %{_bindir}/urxvt256c-mld
@@ -441,6 +433,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Wed Dec 17 2014 Peter Lemenkov <lemenkov@gmail.com> - 9.20-6
+- Don't use HOME for storing control socket. Use XDG directory instead.
+
 * Tue Aug 26 2014 Jitka Plesnikova <jplesnik@redhat.com> - 9.20-5
 - Perl 5.20 rebuild
 
