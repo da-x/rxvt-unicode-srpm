@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.20
-Release:        6%{?dist}
+Version:        9.21
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -11,8 +11,8 @@ Source1:        rxvt-unicode.desktop
 Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
-Patch0:         rxvt-unicode-9.20-Fix-hard-coded-wrong-path-to-xsubpp.patch
-Patch1:		rxvt-unicode-0001-Prefer-XDG_RUNTIME_DIR-over-the-HOME.patch
+Patch0:         rxvt-unicode-9.21-Fix-hard-coded-wrong-path-to-xsubpp.patch
+Patch1:         rxvt-unicode-0001-Prefer-XDG_RUNTIME_DIR-over-the-HOME.patch
 
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
@@ -297,12 +297,11 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_mandir}/man1/urxvt-clipboard-osc.1*
 %{_mandir}/man1/urxvt-confirm-paste.1*
 %{_mandir}/man1/urxvt-digital-clock.1*
+%{_mandir}/man1/urxvt-eval.1*
 %{_mandir}/man1/urxvt-example-refresh-hooks.1*
 %{_mandir}/man1/urxvt-extensions.1*
 %{_mandir}/man1/urxvt-keysym-list.1*
 %{_mandir}/man1/urxvt-kuake.1*
-%exclude %{_mandir}/man1/urxvt-macosx-clipboard-native.1*
-%exclude %{_mandir}/man1/urxvt-macosx-clipboard.1*
 %{_mandir}/man1/urxvt-matcher.1*
 %{_mandir}/man1/urxvt-option-popup.1*
 %{_mandir}/man1/urxvt-overlay-osc.1*
@@ -320,8 +319,6 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_mandir}/man7/urxvt.7*
 %{_datadir}/applications/*rxvt-unicode.desktop
 %{_libdir}/urxvt
-%exclude %{_libdir}/urxvt/perl/macosx-clipboard
-%exclude %{_libdir}/urxvt/perl/macosx-clipboard-native
 %{_datadir}/terminfo/r/rxvt-unicode-256color
 
 %files ml
@@ -337,12 +334,11 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_mandir}/man1/urxvt-ml-clipboard-osc.1*
 %{_mandir}/man1/urxvt-ml-confirm-paste.1*
 %{_mandir}/man1/urxvt-ml-digital-clock.1*
+%{_mandir}/man1/urxvt-ml-eval.1*
 %{_mandir}/man1/urxvt-ml-example-refresh-hooks.1*
 %{_mandir}/man1/urxvt-ml-extensions.1*
 %{_mandir}/man1/urxvt-ml-keysym-list.1*
 %{_mandir}/man1/urxvt-ml-kuake.1*
-%exclude %{_mandir}/man1/urxvt-ml-macosx-clipboard-native.1*
-%exclude %{_mandir}/man1/urxvt-ml-macosx-clipboard.1*
 %{_mandir}/man1/urxvt-ml-matcher.1*
 %{_mandir}/man1/urxvt-ml-option-popup.1*
 %{_mandir}/man1/urxvt-ml-overlay-osc.1*
@@ -373,12 +369,11 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_mandir}/man1/urxvt256c-clipboard-osc.1*
 %{_mandir}/man1/urxvt256c-confirm-paste.1*
 %{_mandir}/man1/urxvt256c-digital-clock.1*
+%{_mandir}/man1/urxvt256c-eval.1*
 %{_mandir}/man1/urxvt256c-example-refresh-hooks.1*
 %{_mandir}/man1/urxvt256c-extensions.1*
 %{_mandir}/man1/urxvt256c-keysym-list.1*
 %{_mandir}/man1/urxvt256c-kuake.1*
-%exclude %{_mandir}/man1/urxvt256c-macosx-clipboard-native.1*
-%exclude %{_mandir}/man1/urxvt256c-macosx-clipboard.1*
 %{_mandir}/man1/urxvt256c-matcher.1*
 %{_mandir}/man1/urxvt256c-option-popup.1*
 %{_mandir}/man1/urxvt256c-overlay-osc.1*
@@ -409,12 +404,11 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_mandir}/man1/urxvt256c-ml-clipboard-osc.1*
 %{_mandir}/man1/urxvt256c-ml-confirm-paste.1*
 %{_mandir}/man1/urxvt256c-ml-digital-clock.1*
+%{_mandir}/man1/urxvt256c-ml-eval.1*
 %{_mandir}/man1/urxvt256c-ml-example-refresh-hooks.1*
 %{_mandir}/man1/urxvt256c-ml-extensions.1*
 %{_mandir}/man1/urxvt256c-ml-keysym-list.1*
 %{_mandir}/man1/urxvt256c-ml-kuake.1*
-%exclude %{_mandir}/man1/urxvt256c-ml-macosx-clipboard-native.1*
-%exclude %{_mandir}/man1/urxvt256c-ml-macosx-clipboard.1*
 %{_mandir}/man1/urxvt256c-ml-matcher.1*
 %{_mandir}/man1/urxvt256c-ml-option-popup.1*
 %{_mandir}/man1/urxvt256c-ml-overlay-osc.1*
@@ -433,6 +427,10 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Fri Jan 02 2015 Andreas Bierfert <andreas.bierfert@lowlatency.de>
+- 9.21-1
+- version upgrade
+
 * Wed Dec 17 2014 Peter Lemenkov <lemenkov@gmail.com> - 9.20-6
 - Don't use HOME for storing control socket. Use XDG directory instead.
 
