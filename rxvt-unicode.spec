@@ -1,10 +1,10 @@
 Name:           rxvt-unicode
 Version:        9.21
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
-License:        GPLv2+
+License:        GPLv3
 URL:            http://software.schmorp.de/
 Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
 Source1:        rxvt-unicode.desktop
@@ -427,6 +427,10 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sat Jan 03 2015 Andreas Bierfert <andreas.bierfert@lowlatency.de>
+- 9.21-3
+- update license to GPLv3
+
 * Sat Jan 03 2015 Andreas Bierfert <andreas.bierfert@lowlatency.de>
 - 9.21-2
 - add patch from Maciej Borzecki to fix gnome-shell matching
