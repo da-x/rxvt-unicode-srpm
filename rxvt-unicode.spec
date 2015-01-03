@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -427,9 +427,14 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sat Jan 03 2015 Andreas Bierfert <andreas.bierfert@lowlatency.de>
+- 9.21-2
+- add patch from Maciej Borzecki to fix gnome-shell matching
+  (rhbz#1031368)
+
 * Fri Jan 02 2015 Andreas Bierfert <andreas.bierfert@lowlatency.de>
 - 9.21-1
-- version upgrade
+- version upgrade (rhbz#830236)
 
 * Wed Dec 17 2014 Peter Lemenkov <lemenkov@gmail.com> - 9.20-6
 - Don't use HOME for storing control socket. Use XDG directory instead.
