@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.21
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -427,6 +427,9 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 9.21-4
+- Rebuilt for GCC 5 C++11 ABI change
+
 * Sat Jan 03 2015 Andreas Bierfert <andreas.bierfert@lowlatency.de>
 - 9.21-3
 - update license to GPLv3
