@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.21
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -427,6 +427,9 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.21-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Wed Jun 03 2015 Jitka Plesnikova <jplesnik@redhat.com> - 9.21-5
 - Perl 5.22 rebuild
 
