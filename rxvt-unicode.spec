@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.21
-Release:        6%{?dist}
+Release:        6.alonid%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -13,6 +13,7 @@ Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-9.21-Fix-hard-coded-wrong-path-to-xsubpp.patch
 Patch1:         rxvt-unicode-0001-Prefer-XDG_RUNTIME_DIR-over-the-HOME.patch
+Patch2:         0001-Squashed-changes-for-24-bit-color.patch
 
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
@@ -69,6 +70,7 @@ Version of rxvt-unicode with 256color and enhanced multi-language support.
 pushd %{name}-%{version}
 %patch0 -p1
 %patch1 -p1 -b .runtime_dir
+%patch2 -p1 -b .24bit_color
 popd
 
 cp -r %{name}-%{version} %{name}-%{version}-ml
@@ -182,7 +184,8 @@ pushd %{name}-%{version}-256color
  --disable-iso14755 \
  --with-term=rxvt-unicode-256color \
  --with-name=urxvt256c \
- --enable-256-color
+ --enable-256-color \
+ --enable-24-bit-color
 
 make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
 popd
@@ -218,7 +221,8 @@ pushd %{name}-%{version}-256color-ml
  --enable-smart-resize \
  --with-term=rxvt-unicode-256color \
  --with-name=urxvt256c-ml \
- --enable-256-color
+ --enable-256-color \
+ --enable-24-bit-color
 
 make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
 popd
@@ -427,6 +431,9 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Fri Oct 30 2015 Dan Aloni <alonid@gmail.com> - 9.21-6.alonid
+- 24 bit color version
+
 * Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 9.21-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
