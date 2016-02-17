@@ -117,7 +117,7 @@ pushd %{name}-%{version}
  --disable-iso14755 \
  --with-term=rxvt-unicode
 
-make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+make %{?_smp_mflags}
 popd
 
 # multi-language version
@@ -152,7 +152,7 @@ pushd %{name}-%{version}-ml
  --with-term=rxvt-unicode \
  --with-name=urxvt-ml
 
-make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+make %{?_smp_mflags}
 popd
 
 # 256 color version
@@ -184,7 +184,7 @@ pushd %{name}-%{version}-256color
  --with-name=urxvt256c \
  --enable-256-color
 
-make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+make %{?_smp_mflags}
 popd
 
 # multi-language version with 256color
@@ -220,7 +220,7 @@ pushd %{name}-%{version}-256color-ml
  --with-name=urxvt256c-ml \
  --enable-256-color
 
-make CFLAGS="%{optflags}" LDFLAGS="-lfontconfig" %{?_smp_mflags}
+make %{?_smp_mflags}
 popd
 
 %install
@@ -284,7 +284,7 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %doc %{name}-%{version}/doc/README.xvt
 %doc %{name}-%{version}/doc/etc
 %doc %{name}-%{version}/doc/changes.txt
-%doc %{name}-%{version}/COPYING
+%license %{name}-%{version}/COPYING
 %{_bindir}/urxvt
 %{_bindir}/urxvtc
 %{_bindir}/urxvtd
@@ -427,6 +427,12 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Wed Feb 17 2016 Till Maas <opensource@till.name> - 9.21-7
+-  Do not overwrite CFLAGS or LDFLAGS with make, they are already set by
+   %%configure and -lfontconfig is added in upstream Makefile. Overwriting
+   LDFLAGS breaks hardening as PIE.
+- Use %%license
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 9.21-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
