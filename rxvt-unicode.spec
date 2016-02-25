@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
-Version:        9.21
-Release:        8%{?dist}
+Version:        9.22
+Release:        1%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -427,6 +427,9 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Thu Feb 25 2016 Andreas Bierfert <andreas.bierfert@lowlatency.de>
+- version upgrade
+
 * Wed Feb 17 2016 Till Maas <opensource@till.name> - 9.21-8
 -  Do not overwrite CFLAGS or LDFLAGS with make, they are already set by
    %%configure and -lfontconfig is added in upstream Makefile. Overwriting
