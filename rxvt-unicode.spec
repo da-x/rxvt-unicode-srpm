@@ -1,6 +1,6 @@
 Name:           rxvt-unicode
 Version:        9.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
@@ -427,6 +427,9 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Sun May 15 2016 Jitka Plesnikova <jplesnik@redhat.com> - 9.22-2
+- Perl 5.24 rebuild
+
 * Thu Feb 25 2016 Andreas Bierfert <andreas.bierfert@lowlatency.de>
 - version upgrade
 
