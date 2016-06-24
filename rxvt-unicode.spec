@@ -24,7 +24,7 @@ BuildRequires:  libXft-devel
 BuildRequires:  libXrender-devel
 BuildRequires:  libXt-devel
 BuildRequires:  xorg-x11-proto-devel
-BuildRequires:  perl-devel, perl(ExtUtils::Embed)
+BuildRequires:  perl-devel, perl-generators, perl(ExtUtils::Embed)
 %if 0%{?fedora} > 13 || !0%{?rhel}
 BuildRequires:  gdk-pixbuf2-devel
 %endif
