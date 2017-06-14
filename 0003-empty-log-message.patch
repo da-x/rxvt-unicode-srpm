@@ -1,0 +1,25 @@
+From 0b6305b601dce6c5f893df65f8fc83418f01011b Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Tue, 21 Jun 2016 15:24:06 +0000
+Subject: [PATCH 03/31] *** empty log message ***
+
+---
+ src/rxvt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/rxvt.h b/src/rxvt.h
+index c896deb4f305..8c190253440d 100644
+--- a/src/rxvt.h
++++ b/src/rxvt.h
+@@ -357,7 +357,7 @@ struct mouse_event
+ # endif
+ #endif
+ 
+-// Hidden color cube for indexed 24-bit colors. There are less Green levels
++// Hidden color cube for indexed 24-bit colors. There are fewer blue levels
+ // because normal human eye is less sensitive to the blue component than to
+ // the red or green. (https://en.m.wikipedia.org/wiki/Color_depth#8-bit_color)
+ #if USE_256_COLORS
+-- 
+2.9.4
+

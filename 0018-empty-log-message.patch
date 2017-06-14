@@ -1,0 +1,37 @@
+From 5da2b333f74b8bd17bd4803c30143af03dc7dc3b Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Tue, 5 Jul 2016 16:42:21 +0000
+Subject: [PATCH 18/31] *** empty log message ***
+
+---
+ src/command.C | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/command.C b/src/command.C
+index 338690d1dbb6..21fde58c66a5 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -4088,6 +4088,8 @@ rxvt_term::process_sgr_mode (unsigned int nargs, const int *arg)
+                 {
+                   idx = minCOLOR + arg[i + 2];
+                   i += 2;
++
++                  scr_color (idx, fgbg);
+                 }
+               else if (nargs > i + 4 && arg[i + 1] == 2)
+                 {
+@@ -4099,9 +4101,9 @@ rxvt_term::process_sgr_mode (unsigned int nargs, const int *arg)
+                   idx = map_rgb24_color (r, g, b, a);
+ 
+                   i += 4;
+-                }
+ 
+-              scr_color (idx, fgbg);
++                  scr_color (idx, fgbg);
++                }
+             }
+             break;
+ 
+-- 
+2.9.4
+

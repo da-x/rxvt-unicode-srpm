@@ -1,0 +1,34 @@
+From 39e99fd1b2d9275e059a7e56d18ee5cb3bd92ff5 Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Thu, 30 Jun 2016 17:00:18 +0000
+Subject: [PATCH 14/31] *** empty log message ***
+
+---
+ src/command.C | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/src/command.C b/src/command.C
+index 3106bc9b79bd..92add58ead5d 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -3388,14 +3388,9 @@ rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
+       int g = idx_r + dxyz[n][1];
+       int b = idx_r + dxyz[n][2];
+ 
+-      if (!IN_RANGE_EXC (r, 0, Red_levels))
+-        continue;
+-
+-      if (!IN_RANGE_EXC (g, 0, Green_levels))
+-        continue;
+-
+-      if (!IN_RANGE_EXC (b, 0, Blue_levels))
+-        continue;
++      if (!IN_RANGE_EXC (r, 0, Red_levels  )) continue;
++      if (!IN_RANGE_EXC (g, 0, Green_levels)) continue;
++      if (!IN_RANGE_EXC (b, 0, Blue_levels )) continue;
+ 
+       unsigned int index = colorcube_index (r, g, b);
+ 
+-- 
+2.9.4
+

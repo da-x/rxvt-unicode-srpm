@@ -1,0 +1,337 @@
+From 703cbdc9de7d9e037403064a37c5c70b0cbcb2cb Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Tue, 21 Jun 2016 12:03:55 +0000
+Subject: [PATCH 02/31] 24-bit direct color support (patch by Fengguang Wu)
+
+Support directly setting RGB fg/bg colors via ISO-8613-3 24-bit
+ANSI color escapes:
+
+  ESC[38;2;<r>;<g>;<b>m Select RGB foreground color
+  ESC[48;2;<r>;<g>;<b>m Select RGB background color
+
+The killer applications for me are vim in tmux. It'll not only modernize
+their look and feeling, but also bring more eye friendly color schemes.
+Very helpful for long time programmers.
+
+To avoid memory overheads and keep the patch non-intrusive, it takes the
+approach to adapt the nearest color in an hidden 6x6x4 (88-color mode)
+or 7x7x5 (256-color mode) color cube to the new 24-bit RGB color.
+
+The pros/cons are:
+
++) least memory footprint (close to 0)
+   comparing to konsole, gnome-terminal etc. real 24-bit arrays
+
++) exact colors and excellent user feelings
+   comparing to xterm, mlterm, etc. approximating to 256 palette
+
++) usable in both the existing 88/256-color modes
+
+   Most vim GUI color schemes show up the same as gvim in rxvt-unicode's
+   88-color mode, not to mention the 256-color mode. Typical applications
+   only use one or two dozens of colors at the same time.
+
+-) may not be able to show 2+ close 24-bit colors
+
+   RGB colors close to each other will likely fall into the same slot in
+   the 6x6x4 or 7x7x5 color cube. If necessary, it could be improved
+   effectively by implementing some collision avoidance logic, trying to
+   find empty/eldest slot in the +1/-1 r/g/b indices (ie. 3-8 neighbors).
+
+The CPU overheads of map_rgb24_color() look ignorable: I feel no
+perceptible slow down when doing vim operations in 24-bit color mode.
+
+A micro benchmark running a test script from [1]:
+
+% time (for i in {1..100}; do 24-bit-color.sh; done)
+
+vanilla rxvt-unicode
+====================
+  2.42s user 1.88s system 31% cpu 13.555 total
+  2.59s user 1.74s system 31% cpu 13.615 total
+  2.46s user 1.85s system 31% cpu 13.631 total
+
+THIS PATCH (adapt hidden color cube to 24-bit)
+==============================================
+  2.33s user 1.97s system 31% cpu 13.598 total
+  2.46s user 1.89s system 31% cpu 13.613 total
+  2.51s user 1.82s system 31% cpu 13.556 total
+
+https://github.com/spudowiar/rxvt-unicode (real 24-bit array)
+=============================================================
+  2.61s user 1.75s system 31% cpu 13.721 total
+  2.48s user 1.82s system 31% cpu 13.566 total
+  2.60s user 1.76s system 31% cpu 13.631 total
+
+USE_256_COLORS is defined in all the above rxvt-unicode builds.
+
+References:
+
+[1] True Colour (16 million colours) support in various terminal
+    applications and terminals
+    https://gist.github.com/XVilka/8346728
+
+[2] https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+---
+ doc/rxvt.1.pod |  9 +++++++++
+ doc/rxvt.7.pod |  2 ++
+ src/command.C  | 43 +++++++++++++++++++++++++++++++++++++++++++
+ src/init.C     | 35 +++++++++++++++++++++++++++++++++++
+ src/rxvt.h     | 27 +++++++++++++++++++++++++--
+ src/rxvtfont.h |  4 ++--
+ src/screen.C   |  2 +-
+ 7 files changed, 117 insertions(+), 5 deletions(-)
+
+diff --git a/doc/rxvt.1.pod b/doc/rxvt.1.pod
+index 19317ef03630..c6f951fb18cd 100644
+--- a/doc/rxvt.1.pod
++++ b/doc/rxvt.1.pod
+@@ -1598,6 +1598,15 @@ high-intensity (potentially bold/blink) versions of the same, and 72 (or
+ 240 in 256 colour mode) colours arranged in an 4x4x4 (or 6x6x6) colour RGB
+ cube plus a 8 (24) colour greyscale ramp.
+ 
++B<@@RXVT_NAME@@> supports direct 24-bit fg/bg RGB colour escapes
++C< ESC [ 38 ; 2 ; R ; G ; Bm > / C< ESC [ 48 ; 2; R ; G ; Bm >. However the
++number of 24-bit colours that can be used is limited: an internal 7x7x5 (256
++colour mode) or 6x6x4 (88 colour mode) colour cube is used to index into the
++24-bit colour space. When indexing collisions happen, the nearest old colour in
++the cube will be adapted to the new 24-bit RGB colour. That means one cannot
++use many similar 24-bit colours. It's typically not a problem in common
++scenarios.
++
+ Here is a list of the ANSI colours with their names.
+ 
+ =begin table
+diff --git a/doc/rxvt.7.pod b/doc/rxvt.7.pod
+index 7ee8b7270ada..0c5d2b758595 100644
+--- a/doc/rxvt.7.pod
++++ b/doc/rxvt.7.pod
+@@ -1605,6 +1605,8 @@ Character Attributes (SGR)
+ 	B<< C<Pm = 36 / 46> >>	fg/bg Cyan
+ 	B<< C<Pm = 37 / 47> >>	fg/bg White
+ 	B<< C<Pm = 38;5 / 48;5> >>	set fg/bg to colour #m (ISO 8613-6)
++	B<< C<Pm = 38;2;R;G;B> >>	set fg to 24-bit colour #RGB (ISO 8613-3)
++	B<< C<Pm = 48;2;R;G;B> >>	set bg to 24-bit colour #RGB (ISO 8613-3)
+ 	B<< C<Pm = 39 / 49> >>	fg/bg Default
+ 	B<< C<Pm = 90 / 100> >>	fg/bg Bright Black
+ 	B<< C<Pm = 91 / 101> >>	fg/bg Bright Red
+diff --git a/src/command.C b/src/command.C
+index 6dcb1832151f..c5a3d6dc80ef 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -3336,6 +3336,31 @@ rxvt_term::process_osc_seq ()
+     }
+ }
+ 
++/*
++ * Find the nearest color slot in the hidden color cube,
++ * adapt its value to the 24bit RGB color.
++ */
++unsigned int
++rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
++{
++  unsigned int idx_r = (r & 0xff) / (0xff / (Red_levels - 1));
++  unsigned int idx_g = (g & 0xff) / (0xff / (Green_levels - 1));
++  unsigned int idx_b = (b & 0xff) / (0xff / (Blue_levels - 1));
++  unsigned int idx;
++
++  idx = minTermCOLOR24 + idx_r * Blue_levels * Green_levels +
++                         idx_g * Blue_levels +
++                         idx_b;
++
++  pix_colors_focused [idx].free (this);
++  pix_colors_focused [idx].set (this, rgba (r * 0x0101,
++                                            g * 0x0101,
++                                            b * 0x0101));
++  update_fade_color (idx, false);
++
++  return idx;
++}
++
+ void
+ rxvt_term::process_color_seq (int report, int color, const char *str, char resp)
+ {
+@@ -3978,6 +4003,15 @@ rxvt_term::process_sgr_mode (unsigned int nargs, const int *arg)
+                 scr_color ((unsigned int) (minCOLOR + arg[i + 2]), Color_fg);
+                 i += 2;
+               }
++            else if (nargs > i + 4 && arg[i + 1] == 2)
++              {
++                unsigned int r = arg[i + 2];
++                unsigned int g = arg[i + 3];
++                unsigned int b = arg[i + 4];
++                unsigned int idx = map_rgb24_color (r, g, b);
++                scr_color (idx, Color_fg);
++                i += 4;
++              }
+             break;
+           case 39:		/* default fg */
+             scr_color (Color_fg, Color_fg);
+@@ -3999,6 +4033,15 @@ rxvt_term::process_sgr_mode (unsigned int nargs, const int *arg)
+                 scr_color ((unsigned int) (minCOLOR + arg[i + 2]), Color_bg);
+                 i += 2;
+               }
++            else if (nargs > i + 4 && arg[i + 1] == 2)
++              {
++                unsigned int r = arg[i + 2];
++                unsigned int g = arg[i + 3];
++                unsigned int b = arg[i + 4];
++                unsigned int idx = map_rgb24_color (r, g, b);
++                scr_color (idx, Color_bg);
++                i += 4;
++              }
+             break;
+           case 49:		/* default bg */
+             scr_color (Color_bg, Color_bg);
+diff --git a/src/init.C b/src/init.C
+index 5a96603f5889..8e6421425412 100644
+--- a/src/init.C
++++ b/src/init.C
+@@ -153,6 +153,31 @@ rxvt_network_display (const char *display)
+ }
+ #endif
+ 
++#define NULL_5   \
++        NULL,    \
++        NULL,    \
++        NULL,    \
++        NULL,    \
++        NULL,
++
++#define NULL_10  \
++        NULL_5   \
++        NULL_5
++
++#define NULL_40  \
++        NULL_10  \
++        NULL_10  \
++        NULL_10  \
++        NULL_10
++
++#define NULL_50  \
++        NULL_40  \
++        NULL_10
++
++#define NULL_100 \
++        NULL_50  \
++        NULL_50
++
+ static const char *const def_colorName[] =
+   {
+     COLOR_FOREGROUND,
+@@ -258,6 +283,12 @@ static const char *const def_colorName[] =
+     "rgb:b9/b9/b9",
+     "rgb:d0/d0/d0",
+     "rgb:e7/e7/e7",
++    NULL_100
++    NULL_40
++    NULL,
++    NULL,
++    NULL,
++    NULL,
+ #else
+     // 256 xterm colours
+     "rgb:00/00/00",
+@@ -500,6 +531,10 @@ static const char *const def_colorName[] =
+     "rgb:da/da/da",
+     "rgb:e4/e4/e4",
+     "rgb:ee/ee/ee",
++    NULL_100
++    NULL_100
++    NULL_40
++    NULL_5
+ #endif
+ 
+ #ifndef NO_CURSORCOLOR
+diff --git a/src/rxvt.h b/src/rxvt.h
+index 4b0a47ea2c89..c896deb4f305 100644
+--- a/src/rxvt.h
++++ b/src/rxvt.h
+@@ -357,6 +357,21 @@ struct mouse_event
+ # endif
+ #endif
+ 
++// Hidden color cube for indexed 24-bit colors. There are less Green levels
++// because normal human eye is less sensitive to the blue component than to
++// the red or green. (https://en.m.wikipedia.org/wiki/Color_depth#8-bit_color)
++#if USE_256_COLORS
++// 7x7x5=245 < 254 unused color indices
++# define Red_levels      7
++# define Green_levels    7
++# define Blue_levels     5
++#else
++// 6x6x4=144 < 166 unused color indices
++# define Red_levels      6
++# define Green_levels    6
++# define Blue_levels     4
++#endif
++
+ #if defined (NO_MOUSE_REPORT) && !defined (NO_MOUSE_REPORT_SCROLLBAR)
+ # define NO_MOUSE_REPORT_SCROLLBAR 1
+ #endif
+@@ -560,6 +575,9 @@ enum colour_list {
+ #else
+   maxTermCOLOR = Color_White + 72,
+ #endif
++  minTermCOLOR24,
++  maxTermCOLOR24 = minTermCOLOR24 +
++                   (Red_levels * Green_levels * Blue_levels) - 1,
+ #ifndef NO_CURSORCOLOR
+   Color_cursor,
+   Color_cursor2,
+@@ -601,9 +619,13 @@ enum colour_list {
+ };
+ 
+ #if USE_256_COLORS
+-# define Color_Bits      9 // 0 .. maxTermCOLOR
++# define Color_Bits      9 // 0 .. maxTermCOLOR24
+ #else
+-# define Color_Bits      7 // 0 .. maxTermCOLOR
++# define Color_Bits      8 // 0 .. maxTermCOLOR24
++#endif
++
++#if maxTermCOLOR24 >= (1 << Color_Bits)
++# error color index overflow
+ #endif
+ 
+ /*
+@@ -1389,6 +1411,7 @@ struct rxvt_term : zero_initialized, rxvt_vars, rxvt_screen
+   void process_osc_seq ();
+   void process_color_seq (int report, int color, const char *str, char resp);
+   void process_xterm_seq (int op, char *str, char resp);
++  unsigned int map_rgb24_color (unsigned int r, unsigned int g, unsigned int b);
+   int privcases (int mode, unsigned long bit);
+   void process_terminal_mode (int mode, int priv, unsigned int nargs, const int *arg);
+   void process_sgr_mode (unsigned int nargs, const int *arg);
+diff --git a/src/rxvtfont.h b/src/rxvtfont.h
+index 239c0ee9ad20..efb150958648 100644
+--- a/src/rxvtfont.h
++++ b/src/rxvtfont.h
+@@ -73,9 +73,9 @@ struct rxvt_fontset
+ 
+   // must be power-of-two - 1, also has to match RS_fontMask in rxvt.h
+ #if USE_256_COLORS
+-  enum { fontCount =   7 }; // 4 extra colors bits, 4 fewer fontcount bits
++  enum { fontCount =   7 }; // 2 extra colors bits, 2 fewer fontcount bits
+ #else
+-  enum { fontCount = 127 };
++  enum { fontCount =  31 };
+ #endif
+ 
+   // index of first font in set
+diff --git a/src/screen.C b/src/screen.C
+index 9eb375ac987e..115afbf2571f 100644
+--- a/src/screen.C
++++ b/src/screen.C
+@@ -617,7 +617,7 @@ rxvt_term::scr_do_wrap () NOTHROW
+ void
+ rxvt_term::scr_color (unsigned int color, int fgbg) NOTHROW
+ {
+-  if (!IN_RANGE_INC (color, minCOLOR, maxTermCOLOR))
++  if (!IN_RANGE_INC (color, minCOLOR, maxTermCOLOR24))
+     color = fgbg;
+ 
+   if (fgbg == Color_fg)
+-- 
+2.9.4
+

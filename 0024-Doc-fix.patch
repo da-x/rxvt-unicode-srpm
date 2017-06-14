@@ -1,0 +1,39 @@
+From d3d3ef835fc19f0d6629da3910f1ac7c26b1ead5 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Sun, 26 Feb 2017 06:36:46 +0000
+Subject: [PATCH 24/30] Doc fix.
+
+---
+ src/perl/kuake  | 2 +-
+ src/perl/tabbed | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/perl/kuake b/src/perl/kuake
+index f6557e08eaec..250544782077 100644
+--- a/src/perl/kuake
++++ b/src/perl/kuake
+@@ -8,7 +8,7 @@ kuake - kuake-like hotkey terminal
+ 
+ =head1 EXAMPLES
+ 
+-  @@RXVT_NAME@@ -kuake-hotkey F10
++  urxvt -kuake-hotkey F10
+ 
+   URxvt.kuake.hotkey: F10
+ 
+diff --git a/src/perl/tabbed b/src/perl/tabbed
+index f82118466a61..d2308c833146 100644
+--- a/src/perl/tabbed
++++ b/src/perl/tabbed
+@@ -31,7 +31,7 @@ following four resources (shown with defaults):
+    URxvt.tabbed.tab-fg:    <colour-index, default 0>
+    URxvt.tabbed.tab-bg:    <colour-index, default 1>
+ 
+-See I<COLOR AND GRAPHICS> in the @@RXVT_NAME@@(1) manpage for valid
++See I<COLOR AND GRAPHICS> in the urxvt(1) manpage for valid
+ indices.
+ 
+ =cut
+-- 
+2.9.4
+

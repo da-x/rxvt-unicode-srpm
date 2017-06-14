@@ -1,0 +1,125 @@
+From d3fc23b4a4ac48a1185985cad764477e951da688 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Thu, 14 Jul 2016 05:10:06 +0000
+Subject: [PATCH 20/31] Add extension autoloading based on resources.
+
+---
+ src/init.C      |  9 +++++++++
+ src/rxvt.h      |  6 +++++-
+ src/urxvt.pm    |  2 ++
+ src/xdefaults.C | 14 +++++++-------
+ 4 files changed, 23 insertions(+), 8 deletions(-)
+
+diff --git a/src/init.C b/src/init.C
+index 8e6421425412..e1e7d83b3ebc 100644
+--- a/src/init.C
++++ b/src/init.C
+@@ -603,6 +603,14 @@ rxvt_term::init_vars ()
+   set_option (Opt_buffered);
+ }
+ 
++#if ENABLE_PERL
++static void
++rxvt_perl_parse_resource (rxvt_term *term, const char *k, const char *v)
++{
++  rxvt_perl.parse_resource (term, k, false, false, 0, v);
++}
++#endif
++
+ /*----------------------------------------------------------------------*/
+ const char **
+ rxvt_term::init_resources (int argc, const char *const *argv)
+@@ -650,6 +658,7 @@ rxvt_term::init_resources (int argc, const char *const *argv)
+       || (rs[Rs_perl_eval] && *rs[Rs_perl_eval]))
+     {
+       rxvt_perl.init (this);
++      enumerate_resources (rxvt_perl_parse_resource);
+       HOOK_INVOKE ((this, HOOK_INIT, DT_END));
+     }
+ #endif
+diff --git a/src/rxvt.h b/src/rxvt.h
+index 707eb47c5354..56e1ac8336d8 100644
+--- a/src/rxvt.h
++++ b/src/rxvt.h
+@@ -1591,7 +1591,11 @@ struct rxvt_term : zero_initialized, rxvt_vars, rxvt_screen
+   int bind_action (const char *str, const char *arg);
+   const char *x_resource (const char *name);
+   void extract_resources ();
+-  void enumerate_keysym_resources (void (*cb)(rxvt_term *, const char *, const char *));
++  void enumerate_resources (void (*cb)(rxvt_term *, const char *, const char *), const char *name_p = 0, const char *class_p = 0);
++  void enumerate_keysym_resources (void (*cb)(rxvt_term *, const char *, const char *))
++  {
++    enumerate_resources (cb, "keysym", "Keysym");
++  }
+   void extract_keysym_resources ();
+ };
+ 
+diff --git a/src/urxvt.pm b/src/urxvt.pm
+index c879019e8d7a..3dcf70201d85 100644
+--- a/src/urxvt.pm
++++ b/src/urxvt.pm
+@@ -606,6 +606,8 @@ sub parse_resource {
+ 
+          push @{ $term->{perl_ext_3} }, $v->[0];
+ 
++         return 1 unless $isarg;
++
+          if ($v->[1] eq "boolean") {
+             $term->put_option_db ($name, $flag ? "true" : "false");
+             return 1;
+diff --git a/src/xdefaults.C b/src/xdefaults.C
+index 894aa8dd8bc8..b1e529cbd18c 100644
+--- a/src/xdefaults.C
++++ b/src/xdefaults.C
+@@ -646,7 +646,7 @@ rxvt_define_key (rxvt_term *term, const char *k, const char *v)
+  *   value will be a string
+  */
+ static int
+-rxvt_keysym_enumerate_helper (
++rxvt_enumerate_helper (
+    XrmDatabase *database ecb_unused,
+    XrmBindingList bindings ecb_unused,
+    XrmQuarkList quarks,
+@@ -861,7 +861,7 @@ rxvt_term::extract_resources ()
+ }
+ 
+ void
+-rxvt_term::enumerate_keysym_resources (void (*cb)(rxvt_term *, const char *, const char *))
++rxvt_term::enumerate_resources (void (*cb)(rxvt_term *, const char *, const char *), const char *name_p, const char *class_p)
+ {
+   /*
+    * [R5 or later]: enumerate the resource database
+@@ -876,25 +876,25 @@ rxvt_term::enumerate_keysym_resources (void (*cb)(rxvt_term *, const char *, con
+   XrmName name_prefix[3];
+   XrmClass class_prefix[3];
+ 
+-  name_prefix[1] = XrmStringToName ("keysym");
++  name_prefix[1] = name_p ? XrmStringToName (name_p) : NULLQUARK;
+   name_prefix[2] = NULLQUARK;
+-  class_prefix[1] = XrmStringToName ("Keysym");
++  class_prefix[1] = class_p ? XrmStringToName (class_p) : NULLQUARK;
+   class_prefix[2] = NULLQUARK;
+ 
+ # ifdef RESFALLBACK
+   name_prefix[0] = class_prefix[0] = XrmStringToName (RESFALLBACK);
+   /* XXX: Need to check sizeof (rxvt_t) == sizeof (XPointer) */
+   XrmEnumerateDatabase (database, name_prefix, class_prefix,
+-                        XrmEnumOneLevel, rxvt_keysym_enumerate_helper, (XPointer)closure);
++                        XrmEnumOneLevel, rxvt_enumerate_helper, (XPointer)closure);
+ # endif
+ 
+   name_prefix[0] = class_prefix[0] = XrmStringToName (RESCLASS);
+   XrmEnumerateDatabase (database, name_prefix, class_prefix,
+-                        XrmEnumOneLevel, rxvt_keysym_enumerate_helper, (XPointer)closure);
++                        XrmEnumOneLevel, rxvt_enumerate_helper, (XPointer)closure);
+ 
+   name_prefix[0] = class_prefix[0] = XrmStringToName (rs[Rs_name]);
+   XrmEnumerateDatabase (database, name_prefix, class_prefix,
+-                        XrmEnumOneLevel, rxvt_keysym_enumerate_helper, (XPointer)closure);
++                        XrmEnumOneLevel, rxvt_enumerate_helper, (XPointer)closure);
+ #endif
+ }
+ 
+-- 
+2.9.4
+

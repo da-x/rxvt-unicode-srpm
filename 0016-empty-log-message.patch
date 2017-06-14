@@ -1,0 +1,25 @@
+From 86603d481fc7716509171edfe4ac727d26db1f8f Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Thu, 30 Jun 2016 17:03:45 +0000
+Subject: [PATCH 16/31] *** empty log message ***
+
+---
+ src/command.C | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/command.C b/src/command.C
+index 35b321fc1a1f..68831f168d59 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -3393,7 +3393,7 @@ rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
+ 
+       if (rgb24_color[index] == color)
+         {
+-          rgb24_seqno[idx] = ++rgb24_sequence;
++          rgb24_seqno[index] = ++rgb24_sequence;
+           return index + minTermCOLOR24;
+         }
+ 
+-- 
+2.9.4
+

@@ -1,0 +1,27 @@
+From a94400619aa25f6e1c73d7774add8d4374aab158 Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Wed, 22 Jun 2016 07:30:52 +0000
+Subject: [PATCH 04/31] *** empty log message ***
+
+---
+ doc/podtbl | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/doc/podtbl b/doc/podtbl
+index 7cde4f165f66..8d910e4603bd 100755
+--- a/doc/podtbl
++++ b/doc/podtbl
+@@ -81,6 +81,10 @@ sub verbatim {
+    # pod::xhtml fails on begin/end blocks
+ #   print $fh "=begin xhtml\n\n";
+ 
++   print $fh "=for xhtml <table>";
++   print $fh map "<tr><td>" . +(join "</td><td>", htmlfcodes @$_) . "</td></tr>", @$table;
++   print $fh "</table>\n\n";
++
+    print $fh "=for html <table>";
+    print $fh map "<tr><td>" . +(join "</td><td>", htmlfcodes @$_) . "</td></tr>", @$table;
+    print $fh "</table>\n\n";
+-- 
+2.9.4
+

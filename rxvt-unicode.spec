@@ -1,18 +1,48 @@
 Name:           rxvt-unicode
-Version:        9.22
-Release:        2%{?dist}
+Version:        9.23pre
+Release:        1.alonid%{?dist}
 Summary:        Unicode version of rxvt
 
 Group:          User Interface/X
 License:        GPLv3
 URL:            http://software.schmorp.de/
-Source0:        http://dist.schmorp.de/%{name}/%{name}-%{version}.tar.bz2
+Source0:        http://dist.schmorp.de/%{name}/%{name}-9.22.tar.bz2
 Source1:        rxvt-unicode.desktop
 Source2:        rxvt-unicode-ml.desktop
 Source3:        rxvt-unicode-256color.desktop
 Source4:        rxvt-unicode-256color-ml.desktop
 Patch0:         rxvt-unicode-9.21-Fix-hard-coded-wrong-path-to-xsubpp.patch
 Patch1:         rxvt-unicode-0001-Prefer-XDG_RUNTIME_DIR-over-the-HOME.patch
+Patch10001:     0001-Implement-xterm-focus-reporting-mode.patch
+Patch10002:     0002-24-bit-direct-color-support-patch-by-Fengguang-Wu.patch
+Patch10003:     0003-empty-log-message.patch
+Patch10004:     0004-empty-log-message.patch
+Patch10005:     0005-empty-log-message.patch
+Patch10006:     0006-Update-Changes.patch
+Patch10007:     0007-Fix-invalid-moves-when-smart-resize-is-enabled-and-t.patch
+Patch10008:     0008-24-bit-color-cube-collision-avoidance-patch-by-Fengg.patch
+Patch10009:     0009-Fix-test.patch
+Patch10010:     0010-truecolour-replacement-tuning.patch
+Patch10011:     0011-empty-log-message.patch
+Patch10012:     0012-empty-log-message.patch
+Patch10013:     0013-empty-log-message.patch
+Patch10014:     0014-empty-log-message.patch
+Patch10015:     0015-empty-log-message.patch
+Patch10016:     0016-empty-log-message.patch
+Patch10017:     0017-empty-log-message.patch
+Patch10018:     0018-empty-log-message.patch
+Patch10019:     0019-Doc-fix.patch
+Patch10020:     0020-Add-extension-autoloading-based-on-resources.patch
+Patch10021:     0021-Move-old-bg-image-frontend-to-background-extension.patch
+Patch10022:     0022-Fix-bg-option-priority.patch
+Patch10023:     0023-Update-Changes.patch
+Patch10024:     0024-Doc-fix.patch
+Patch10025:     0025-Fix-reference-counting-in-overlay-hide.patch
+Patch10026:     0026-Update-Changes.patch
+Patch10027:     0027-empty-log-message.patch
+Patch10028:     0028-Add-.gitignore.patch
+Patch10029:     0029-Squashed-changes-for-24-bit-color.patch
+Patch10030:     0030-Revert-Add-extension-autoloading-based-on-resources.patch
 
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
@@ -65,33 +95,62 @@ Requires:       %{name} = %{version}-%{release}
 Version of rxvt-unicode with 256color and enhanced multi-language support.
 
 %prep
-%setup -q -c %{name}-%{version}
-pushd %{name}-%{version}
+%setup -q -c %{name}-9.22
+pushd %{name}-9.22
 %patch0 -p1
 %patch1 -p1 -b .runtime_dir
+%patch10001 -p1 -b .10001
+%patch10002 -p1 -b .10002
+%patch10003 -p1 -b .10003
+%patch10004 -p1 -b .10004
+%patch10005 -p1 -b .10005
+%patch10006 -p1 -b .10006
+%patch10007 -p1 -b .10007
+%patch10008 -p1 -b .10008
+%patch10009 -p1 -b .10009
+%patch10010 -p1 -b .10010
+%patch10011 -p1 -b .10011
+%patch10012 -p1 -b .10012
+%patch10013 -p1 -b .10013
+%patch10014 -p1 -b .10014
+%patch10015 -p1 -b .10015
+%patch10016 -p1 -b .10016
+%patch10017 -p1 -b .10017
+%patch10018 -p1 -b .10018
+%patch10019 -p1 -b .10019
+%patch10020 -p1 -b .10020
+%patch10021 -p1 -b .10021
+%patch10022 -p1 -b .10022
+%patch10023 -p1 -b .10023
+%patch10024 -p1 -b .10024
+%patch10025 -p1 -b .10025
+%patch10026 -p1 -b .10026
+%patch10027 -p1 -b .10027
+%patch10029 -p1 -b .10029
+%patch10030 -p1 -b .10030
 popd
 
-cp -r %{name}-%{version} %{name}-%{version}-ml
-cp -r %{name}-%{version} %{name}-%{version}-256color
-cp -r %{name}-%{version} %{name}-%{version}-256color-ml
+cp -r %{name}-9.22 %{name}-9.22-ml
+cp -r %{name}-9.22 %{name}-9.22-256color
+cp -r %{name}-9.22 %{name}-9.22-256color-ml
 
 %if 0%{?fedora} >= 15
-rm -rf %{name}-%{version}/libev
-ln -s %{_datadir}/libev-source %{name}-%{version}/libev
+rm -rf %{name}-9.22/libev
+ln -s %{_datadir}/libev-source %{name}-9.22/libev
 
-rm -rf %{name}-%{version}-ml/libev
-ln -s %{_datadir}/libev-source %{name}-%{version}-ml/libev
+rm -rf %{name}-9.22-ml/libev
+ln -s %{_datadir}/libev-source %{name}-9.22-ml/libev
 
-rm -rf %{name}-%{version}-256color/libev
-ln -s %{_datadir}/libev-source %{name}-%{version}-256color/libev
+rm -rf %{name}-9.22-256color/libev
+ln -s %{_datadir}/libev-source %{name}-9.22-256color/libev
 
-rm -rf %{name}-%{version}-256color-ml/libev
-ln -s %{_datadir}/libev-source %{name}-%{version}-256color-ml/libev
+rm -rf %{name}-9.22-256color-ml/libev
+ln -s %{_datadir}/libev-source %{name}-9.22-256color-ml/libev
 %endif
 
 %build
 # standard version
-pushd %{name}-%{version}
+pushd %{name}-9.22
 %configure \
  --enable-keepscrolling \
  --enable-selectionscrolling \
@@ -121,7 +180,7 @@ make %{?_smp_mflags}
 popd
 
 # multi-language version
-pushd %{name}-%{version}-ml
+pushd %{name}-9.22-ml
 %configure \
  --enable-keepscrolling \
  --enable-selectionscrolling \
@@ -156,7 +215,7 @@ make %{?_smp_mflags}
 popd
 
 # 256 color version
-pushd %{name}-%{version}-256color
+pushd %{name}-9.22-256color
 %configure \
  --enable-keepscrolling \
  --enable-selectionscrolling \
@@ -182,13 +241,14 @@ pushd %{name}-%{version}-256color
  --disable-iso14755 \
  --with-term=rxvt-unicode-256color \
  --with-name=urxvt256c \
- --enable-256-color
+ --enable-256-color \
+ --enable-24-bit-color
 
 make %{?_smp_mflags}
 popd
 
 # multi-language version with 256color
-pushd %{name}-%{version}-256color-ml
+pushd %{name}-9.22-256color-ml
 %configure \
  --enable-keepscrolling \
  --enable-selectionscrolling \
@@ -218,15 +278,16 @@ pushd %{name}-%{version}-256color-ml
  --enable-smart-resize \
  --with-term=rxvt-unicode-256color \
  --with-name=urxvt256c-ml \
- --enable-256-color
+ --enable-256-color \
+ --enable-24-bit-color
 
 make %{?_smp_mflags}
 popd
 
 %install
 for ver in \
- %{name}-%{version} %{name}-%{version}-ml \
- %{name}-%{version}-256color %{name}-%{version}-256color-ml;
+ %{name}-9.22 %{name}-9.22-ml \
+ %{name}-9.22-256color %{name}-9.22-256color-ml;
 do
     pushd ${ver}
     make install DESTDIR=%{buildroot}
@@ -275,16 +336,16 @@ desktop-file-install \
 # install terminfo for 256color
 mkdir -p %{buildroot}%{_datadir}/terminfo/r/
 tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
- %{name}-%{version}/doc/etc/rxvt-unicode.terminfo
+ %{name}-9.22/doc/etc/rxvt-unicode.terminfo
 
 
 %files
-%doc %{name}-%{version}/README.FAQ
-%doc %{name}-%{version}/INSTALL
-%doc %{name}-%{version}/doc/README.xvt
-%doc %{name}-%{version}/doc/etc
-%doc %{name}-%{version}/doc/changes.txt
-%license %{name}-%{version}/COPYING
+%doc %{name}-9.22/README.FAQ
+%doc %{name}-9.22/INSTALL
+%doc %{name}-9.22/doc/README.xvt
+%doc %{name}-9.22/doc/etc
+%doc %{name}-9.22/doc/changes.txt
+%license %{name}-9.22/COPYING
 %{_bindir}/urxvt
 %{_bindir}/urxvtc
 %{_bindir}/urxvtd
@@ -427,6 +488,9 @@ tic -e rxvt-unicode-256color -s -o %{buildroot}%{_datadir}/terminfo/ \
 %{_datadir}/applications/*rxvt-unicode-256color-ml.desktop
 
 %changelog
+* Fri Jan 14 2017 Dan Aloni <alonid@gmail.com> - 9.23pre-1.alonid
+- 24 bit color version
+
 * Sun May 15 2016 Jitka Plesnikova <jplesnik@redhat.com> - 9.22-2
 - Perl 5.24 rebuild
 

@@ -1,0 +1,86 @@
+From 75264fa544529a21ff79d3da26eb3130c43444a5 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Sat, 14 May 2016 08:31:26 +0000
+Subject: [PATCH 01/31] Implement xterm focus reporting mode.
+
+Patch by Daniel Hahler.
+---
+ doc/rxvt.7.pod | 5 +++--
+ src/command.C  | 7 +++++++
+ src/rxvt.h     | 1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/doc/rxvt.7.pod b/doc/rxvt.7.pod
+index e39908fc9070..7ee8b7270ada 100644
+--- a/doc/rxvt.7.pod
++++ b/doc/rxvt.7.pod
+@@ -1934,12 +1934,12 @@ X<Priv66>
+ 
+ =end table
+ 
+-=item B<< C<Pm = 1004> >> (X11 XTerm focus in/focus out events) I<unimplemented>
++=item B<< C<Pm = 1004> >> (X11 XTerm focus in/focus out events)
+ 
+ =begin table
+ 
+ 	B<< C<h> >>	Send Mouse focus in/focus out events.
+-	B<< C<l> >>	Don'T send focus events.
++	B<< C<l> >>	Don't send focus events.
+ 
+ =end table
+ 
+@@ -2469,6 +2469,7 @@ in combination with other switches) is:
+   compile in built-in block graphics
+   skip builtin block graphics (-sbg)
+   separate highlight colour (-highlightColor, -highlightTextColor)
++  focus reporting mode (1004).
+   extended mouse reporting modes (1005 and 1015).
+   visual selection via -visual and -depth.
+ 
+diff --git a/src/command.C b/src/command.C
+index 7b79f516ac5f..6dcb1832151f 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -1789,6 +1789,9 @@ rxvt_term::focus_in ()
+ #if ENABLE_FRILLS
+       if (option (Opt_urgentOnBell))
+         set_urgency (0);
++
++      if (priv_modes & PrivMode_FocusEvent)
++        tt_printf ("\x1b[I");
+ #endif
+ 
+       HOOK_INVOKE ((this, HOOK_FOCUS_IN, DT_END));
+@@ -1806,6 +1809,9 @@ rxvt_term::focus_out ()
+ #if ENABLE_FRILLS
+       if (option (Opt_urgentOnBell))
+         set_urgency (0);
++
++      if (priv_modes & PrivMode_FocusEvent)
++        tt_printf ("\x1b[O");
+ #endif
+ #if ENABLE_FRILLS || ISO_14755
+       if (iso14755buf)
+@@ -3709,6 +3715,7 @@ rxvt_term::process_terminal_mode (int mode, int priv ecb_unused, unsigned int na
+                   { 1002, PrivMode_MouseBtnEvent },
+                   { 1003, PrivMode_MouseAnyEvent },
+ #if ENABLE_FRILLS
++                  { 1004, PrivMode_FocusEvent },
+                   { 1005, PrivMode_ExtModeMouse },
+ #endif
+                   { 1010, PrivMode_TtyOutputInh }, // rxvt extension
+diff --git a/src/rxvt.h b/src/rxvt.h
+index 5c7cf669bb8a..4b0a47ea2c89 100644
+--- a/src/rxvt.h
++++ b/src/rxvt.h
+@@ -645,6 +645,7 @@ enum {
+ #define PrivMode_ExtModeMouse   (1UL<<23) // xterm pseudo-utf-8 hack
+ #define PrivMode_ExtMouseRight  (1UL<<24) // xterm pseudo-utf-8, but works in non-utf-8-locales
+ #define PrivMode_BlinkingCursor (1UL<<25)
++#define PrivMode_FocusEvent     (1UL<<26)
+ 
+ #define PrivMode_mouse_report   (PrivMode_MouseX10|PrivMode_MouseX11|PrivMode_MouseBtnEvent|PrivMode_MouseAnyEvent)
+ 
+-- 
+2.9.4
+

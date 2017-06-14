@@ -1,0 +1,25 @@
+From 9f38beb368db461e1339df69b2b8184c04967bd9 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Wed, 12 Apr 2017 19:43:53 +0000
+Subject: [PATCH 26/30] Update Changes.
+
+---
+ Changes | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Changes b/Changes
+index 38876ba61cf5..0beceb09c374 100644
+--- a/Changes
++++ b/Changes
+@@ -46,6 +46,8 @@ TODO: üpixel droppins idenrasm,ll,scrollup
+ 	- in some window managers, if smart resize was enabled, urxvt
+ 	  erroneously moved the window on font change - awesome bug
+ 	  #532, arch linux bug ##34807 (patch by Uli Schlachter).
++	- fix high memory usage when an extension repeatedly hides and
++	  shows an overlay (reported by Marcel Lautenbach).
+ 	- the old bg image resources are now provided by the background
+ 	  extension, and perl is thus required for bg image support. No
+ 	  configuration change is needed: urxvt autoloads the background
+-- 
+2.9.4
+

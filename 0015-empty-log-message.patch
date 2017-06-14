@@ -1,0 +1,49 @@
+From 519a3a9a95ce3ddc5f84fe2a304be14dd1472c07 Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Thu, 30 Jun 2016 17:02:22 +0000
+Subject: [PATCH 15/31] *** empty log message ***
+
+---
+ src/command.C | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/command.C b/src/command.C
+index 92add58ead5d..35b321fc1a1f 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -3367,9 +3367,6 @@ rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
+   unsigned int idx_b = b * (Blue_levels  - 1) / 0xff;
+   unsigned int idx = colorcube_index (idx_r, idx_g, idx_b);
+ 
+-  if (rgb24_color[idx] == color)
+-    return idx + minTermCOLOR24;
+-
+   /* we allow one of the 6 directly neighbouring colours */
+   /* to replace the current color, if they not used recently */
+   static const signed char dxyz[][3] = {
+@@ -3394,6 +3391,12 @@ rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
+ 
+       unsigned int index = colorcube_index (r, g, b);
+ 
++      if (rgb24_color[index] == color)
++        {
++          rgb24_seqno[idx] = ++rgb24_sequence;
++          return index + minTermCOLOR24;
++        }
++
+       // minor issue: could update index 0 few more times
+       if ((rgb24_seqno[index] | rgb24_color[index]) == 0)
+         {
+@@ -3401,9 +3404,6 @@ rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
+           goto update;
+         }
+ 
+-      if (rgb24_color[index] == color)
+-        return index + minTermCOLOR24;
+-
+       // like (rgb24_seqno[idx] > rgb24_seqno[index])
+       // but also handles wrap around values good enough
+       if ((uint16_t)(rgb24_seqno[idx] - rgb24_seqno[index]) < 0x7fff)
+-- 
+2.9.4
+

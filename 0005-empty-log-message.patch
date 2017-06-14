@@ -1,0 +1,25 @@
+From 8f15f0cc8a2868cb73e9e649e78a72c9fa74fa2e Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Wed, 22 Jun 2016 07:31:49 +0000
+Subject: [PATCH 05/31] *** empty log message ***
+
+---
+ doc/rxvt.7.pod | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/rxvt.7.pod b/doc/rxvt.7.pod
+index 0c5d2b758595..d6028811c558 100644
+--- a/doc/rxvt.7.pod
++++ b/doc/rxvt.7.pod
+@@ -1950,7 +1950,7 @@ X<Priv66>
+ Try to avoid this mode, it doesn't work sensibly in non-UTF-8 locales. Use
+ mode C<1015> instead.
+ 
+-Unlike XTerm, coordinates larger than 2015) will work fine.
++Unlike XTerm, coordinates larger than 2015 will work fine.
+ 
+ =begin table
+ 
+-- 
+2.9.4
+

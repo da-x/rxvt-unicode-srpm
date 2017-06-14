@@ -1,0 +1,51 @@
+From 0cd7003cfacb4ba6f715b2dd0effb96b8d9251a9 Mon Sep 17 00:00:00 2001
+From: Marc Lehmann <schmorp@schmorp.de>
+Date: Thu, 18 May 2017 02:43:18 +0000
+Subject: [PATCH 27/30] *** empty log message ***
+
+---
+ Changes       | 4 ++++
+ src/command.C | 4 ++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Changes b/Changes
+index 0beceb09c374..7b820ba07d8c 100644
+--- a/Changes
++++ b/Changes
+@@ -40,7 +40,11 @@ TODO: simplify extension metainfo cache, cache on disk
+ TODO: URxvt::Ext::Name installs urxvt ext name and provides pod/manpage for URxvt::Ext::Name
+ 
+ TODO: üpixel droppins idenrasm,ll,scrollup
++TODO: cuu/cud and probably others default to 1 when arg is 0, not just missing, in xterm/vt102, but not in rxvt
+ 
++TODO: fix ESC G reply forever, or simply completely disable it?
++	- improved security: rob nation's (obsolete) graphics mode queries
++          no longer reply with linefeed in secure/default mode.
+ 	- ISO 8613-3 direct colour SGR sequences (patch by Fengguang Wu).
+ 	- xterm focus reporting mode (patch by Daniel Hahler).
+ 	- in some window managers, if smart resize was enabled, urxvt
+diff --git a/src/command.C b/src/command.C
+index 19e4fccf6897..ed376ed173d2 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -2695,7 +2695,7 @@ rxvt_term::process_escape_seq ()
+         /* kidnapped escape sequence: Should be 8.3.48 */
+       case C1_ESA:		/* ESC G */
+         // used by original rxvt for rob nations own graphics mode
+-        if (cmd_getc () == 'Q')
++        if (cmd_getc () == 'Q' && option (Opt_insecure))
+           tt_printf ("\033G0\012");	/* query graphics - no graphics */
+         break;
+ 
+@@ -2914,7 +2914,7 @@ rxvt_term::process_csi_seq ()
+         break;
+ 
+       case CSI_CUB:		/* 8.3.18: (1) CURSOR LEFT */
+-      case CSI_HPB: 		/* 8.3.59: (1) CHARACTER POSITION BACKWARD */
++      case CSI_HPB:		/* 8.3.59: (1) CHARACTER POSITION BACKWARD */
+ #ifdef ISO6429
+         arg[0] = -arg[0];
+ #else				/* emulate common DEC VTs */
+-- 
+2.9.4
+

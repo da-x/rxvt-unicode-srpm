@@ -1,0 +1,32 @@
+From 9df1f4a9bfc6280afae6f2ad8a30ecadb762cd4d Mon Sep 17 00:00:00 2001
+From: Dan Aloni <alonid@gmail.com>
+Date: Wed, 14 Jun 2017 18:10:21 +0300
+Subject: [PATCH 28/30] Add .gitignore
+
+---
+ .gitignore | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 000000000000..d4ee2d035914
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,13 @@
++*.o
++doc/*.man
++Makefile
++config.h
++config.log
++config.status
++doc/Makefile
++src/Makefile
++src/perlxsi.c
++src/rxvt
++src/rxvtc
++src/rxvtd
++src/rxvtperl.C
+-- 
+2.9.4
+

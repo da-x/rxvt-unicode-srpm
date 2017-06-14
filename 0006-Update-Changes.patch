@@ -1,0 +1,24 @@
+From c9a04416d6ec622e8f1f9288da537fd98f1aa878 Mon Sep 17 00:00:00 2001
+From: Dan Aloni <alonid@gmail.com>
+Date: Wed, 14 Jun 2017 19:34:09 +0300
+Subject: [PATCH] Reapply 0006
+
+---
+ Changes | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Changes b/Changes
+index d08a94ad8d41..6842f9d8918b 100644
+--- a/Changes
++++ b/Changes
+@@ -27,6 +27,7 @@ TODO: load must not cache, but global image cache must be cleaned
+ TODO: description into --help output?
+ TODO: rxvt -help => (see rxvt-XXX(1))?
+ TODO: xor_rect should shift right
++TODO: implement iso-8613 38/48 sgr sequences with subparameters
+ TODO IMPL: recalc bg only when not fully covering (no alpha, repeat|extend etc..)
+ 
+ TODO IMPL: colour-change event with index
+-- 
+2.9.4
+

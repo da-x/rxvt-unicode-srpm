@@ -1,0 +1,150 @@
+From b53eb4f5367920b76ca916f9fdf2210051a5b795 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Thu, 30 Jun 2016 11:33:42 +0000
+Subject: [PATCH 08/31] 24-bit color cube collision avoidance (patch by
+ Fengguang Wu)
+
+When the color cube slot is found to be already occupied by a similar
+24-bit color, search through the -1, 0, +1 R/G/B indices trying to find
+an empty slot, or the oldest used one (which hopefully is no longer in
+active use).
+
+This effectively reduces random collisions, hence make it pretty hard to
+hit a vim GUI color scheme that cannot be correctly showed in urxvt.
+---
+ src/command.C | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ src/rxvt.h    |  8 ++++++-
+ 2 files changed, 76 insertions(+), 8 deletions(-)
+
+diff --git a/src/command.C b/src/command.C
+index c5a3d6dc80ef..caf939d2bc38 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -3336,6 +3336,20 @@ rxvt_term::process_osc_seq ()
+     }
+ }
+ 
++static unsigned int
++colorcube_index (unsigned int idx_r,
++                 unsigned int idx_g,
++                 unsigned int idx_b)
++{
++  assert (idx_r < Red_levels);
++  assert (idx_g < Green_levels);
++  assert (idx_b < Blue_levels);
++
++  return idx_r * Blue_levels * Green_levels +
++         idx_g * Blue_levels +
++         idx_b;
++}
++
+ /*
+  * Find the nearest color slot in the hidden color cube,
+  * adapt its value to the 24bit RGB color.
+@@ -3343,15 +3357,63 @@ rxvt_term::process_osc_seq ()
+ unsigned int
+ rxvt_term::map_rgb24_color (unsigned int r, unsigned int g, unsigned int b)
+ {
+-  unsigned int idx_r = (r & 0xff) / (0xff / (Red_levels - 1));
+-  unsigned int idx_g = (g & 0xff) / (0xff / (Green_levels - 1));
+-  unsigned int idx_b = (b & 0xff) / (0xff / (Blue_levels - 1));
+-  unsigned int idx;
++  r &= 0xff;
++  g &= 0xff;
++  b &= 0xff;
++
++  unsigned int color = (r << 16) | (g << 8) | b;
++  unsigned int idx_r = r / (0xff / (Red_levels - 1));
++  unsigned int idx_g = g / (0xff / (Green_levels - 1));
++  unsigned int idx_b = b / (0xff / (Blue_levels - 1));
++  unsigned int idx = colorcube_index (idx_r, idx_g, idx_b);
++
++  // minor issue: could update idx 0 few more times
++  if (rgb24_seqno[idx] == 0
++      && rgb24_color[idx] == 0)
++    goto update;
++
++  if (rgb24_color[idx] == color)
++    return idx + minTermCOLOR24;
++
++  for (int i = idx_r - 1; i <= (signed) idx_r + 1; i++)
++    {
++      if (!IN_RANGE_EXC (i, 0, Red_levels))
++        continue;
++
++      for (int j = idx_g - 1; j <= (signed) idx_g + 1; j++)
++        {
++          if (!IN_RANGE_EXC (j, 0, Green_levels))
++            continue;
++
++          for (int k = idx_b - 1; k <= (signed) idx_b + 1; k++)
++            {
++              if (!IN_RANGE_EXC (k, 0, Blue_levels))
++                continue;
++
++              unsigned int index = colorcube_index (i, j, k);
++
++              // minor issue: could update index 0 few more times
++              if (rgb24_seqno[index] == 0
++                  && rgb24_color[index] == 0)
++                {
++                  idx = index;
++                  goto update;
++                }
++
++              if (rgb24_color[index] == color)
++                return index + minTermCOLOR24;
++
++              if (IN_RANGE_INC (rgb24_seqno[idx], rgb24_seqno[index], 0x7fff))
++                idx = index;
++            }
++        }
++    }
+ 
+-  idx = minTermCOLOR24 + idx_r * Blue_levels * Green_levels +
+-                         idx_g * Blue_levels +
+-                         idx_b;
++update:
++  rgb24_color[idx] = color;
++  rgb24_seqno[idx] = ++rgb24_sequence;
+ 
++  idx += minTermCOLOR24;
+   pix_colors_focused [idx].free (this);
+   pix_colors_focused [idx].set (this, rgba (r * 0x0101,
+                                             g * 0x0101,
+diff --git a/src/rxvt.h b/src/rxvt.h
+index 8c190253440d..d10e6a4fd8f4 100644
+--- a/src/rxvt.h
++++ b/src/rxvt.h
+@@ -372,6 +372,8 @@ struct mouse_event
+ # define Blue_levels     4
+ #endif
+ 
++#define RGB24_CUBE_SIZE (Red_levels * Green_levels * Blue_levels)
++
+ #if defined (NO_MOUSE_REPORT) && !defined (NO_MOUSE_REPORT_SCROLLBAR)
+ # define NO_MOUSE_REPORT_SCROLLBAR 1
+ #endif
+@@ -577,7 +579,7 @@ enum colour_list {
+ #endif
+   minTermCOLOR24,
+   maxTermCOLOR24 = minTermCOLOR24 +
+-                   (Red_levels * Green_levels * Blue_levels) - 1,
++                   RGB24_CUBE_SIZE - 1,
+ #ifndef NO_CURSORCOLOR
+   Color_cursor,
+   Color_cursor2,
+@@ -1272,6 +1274,10 @@ struct rxvt_term : zero_initialized, rxvt_vars, rxvt_screen
+   void           *chunk;
+   size_t          chunk_size;
+ 
++  uint32_t        rgb24_color[RGB24_CUBE_SIZE];   // the 24-bit color value
++  uint16_t        rgb24_seqno[RGB24_CUBE_SIZE];   // which one is older?
++  uint16_t        rgb24_sequence;
++
+   static vector<rxvt_term *> termlist; // a vector of all running rxvt_term's
+ 
+ #if ENABLE_FRILLS || ISO_14755
+-- 
+2.9.4
+

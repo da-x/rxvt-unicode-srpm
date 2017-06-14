@@ -1,0 +1,1733 @@
+From 7164daa90b6f8f81616e9a674239969fd6bc4e85 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Thu, 14 Jul 2016 05:33:25 +0000
+Subject: [PATCH 21/31] Move old bg image frontend to background extension.
+
+---
+ MANIFEST            |   1 -
+ doc/rxvt.1.pod      | 114 -----------
+ doc/rxvt.7.pod      |  23 ---
+ src/Makefile.in     |   2 +-
+ src/background.C    | 544 ----------------------------------------------------
+ src/command.C       | 106 +---------
+ src/init.C          |   7 -
+ src/main.C          |  46 +----
+ src/perl/background | 362 +++++++++++++++++++++++++++++++++-
+ src/rsinc.h         |   9 -
+ src/rxvt.h          | 128 +------------
+ src/rxvtfont.C      |   4 +-
+ src/rxvtperl.xs     |   2 +-
+ src/xdefaults.C     |  11 --
+ 14 files changed, 370 insertions(+), 989 deletions(-)
+ delete mode 100644 src/background.C
+
+diff --git a/MANIFEST b/MANIFEST
+index b3f0d0e45949..848f2b2a61d1 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -42,7 +42,6 @@ doc/extensions.pod.bot
+ 
+ src/.cvsignore
+ src/Makefile.in
+-src/background.C
+ src/callback.h
+ src/command.C
+ src/command.h
+diff --git a/doc/rxvt.1.pod b/doc/rxvt.1.pod
+index c6f951fb18cd..3f4915d4f2dd 100644
+--- a/doc/rxvt.1.pod
++++ b/doc/rxvt.1.pod
+@@ -1325,120 +1325,6 @@ Turn on/off ISO 14755 5.2 mode (default enabled).
+ 
+ =back
+ 
+-=head1 BACKGROUND IMAGE OPTIONS AND RESOURCES
+-
+-=over 4
+-
+-=item B<-pixmap> I<file[;oplist]>
+-
+-=item B<backgroundPixmap:> I<file[;oplist]>
+-
+-Compile I<pixbuf>: Use the specified image file as the window's
+-background and also optionally specify a colon separated list of
+-operations to modify it. Note that you may need to quote the C<;>
+-character when using the command line option, as C<;> is usually a
+-metacharacter in shells. Supported operations are:
+-
+-=over 4
+-
+-=item B<WxH+X+Y>
+-
+-sets scale and position. B<"W" / "H"> specify the horizontal/vertical
+-scale (percent), and B<"X" / "Y"> locate the image centre (percent). A
+-scale of 0 disables scaling.
+-
+-=item B<op=tile>
+-
+-enables tiling
+-
+-=item B<op=keep-aspect>
+-
+-maintain the image aspect ratio when scaling
+-
+-=item B<op=root-align>
+-
+-use the position of the terminal window relative to the root window as
+-the image offset, simulating a root window background
+-
+-=back
+-
+-The default scale and position setting is C<100x100+50+50>.
+-Alternatively, a predefined set of templates can be used to achieve
+-the most common setups:
+-
+-=over 4
+-
+-=item B<style=tiled>
+-
+-the image is tiled with no scaling. Equivalent to 0x0+0+0:op=tile
+-
+-=item B<style=aspect-stretched>
+-
+-the image is scaled to fill the whole window maintaining the aspect
+-ratio and centered. Equivalent to 100x100+50+50:op=keep-aspect
+-
+-=item B<style=stretched>
+-
+-the image is scaled to fill the whole window. Equivalent to 100x100
+-
+-=item B<style=centered>
+-
+-the image is centered with no scaling. Equivalent to 0x0+50+50
+-
+-=item B<style=root-tiled>
+-
+-the image is tiled with no scaling and using 'root' positioning.
+-Equivalent to 0x0:op=tile:op=root-align
+-
+-=back
+-
+-If multiple templates are specified the last one wins. Note that a
+-template overrides all the scale, position and operations settings.
+-
+-If used in conjunction with pseudo-transparency, the specified pixmap
+-will be blended over the transparent background using alpha-blending.
+-
+-=item B<-tr>|B<+tr>
+-
+-=item B<transparent:> I<boolean>
+-
+-Turn on/off pseudo-transparency by using the root pixmap as background.
+-
+-B<-ip> (B<inheritPixmap>) is still accepted as an obsolete alias but
+-will be removed in future versions.
+-
+-=item B<-tint> I<colour>
+-
+-=item B<tintColor:> I<colour>
+-
+-Tint the transparent background with the given colour. Note that a
+-black tint yields a completely black image while a white tint yields
+-the image unchanged.
+-
+-=item B<-sh> I<number>
+-
+-=item B<shading:> I<number>
+-
+-Darken (0 .. 99) or lighten (101 .. 200) the transparent background.
+-A value of 100 means no shading.
+-
+-=item B<-blr> I<HxV>
+-
+-=item B<blurRadius:> I<HxV>
+-
+-Apply gaussian blur with the specified radius to the transparent
+-background. If a single number is specified, the vertical and
+-horizontal radii are considered to be the same. Setting one of the
+-radii to 1 and the other to a large number creates interesting effects
+-on some backgrounds. The maximum radius value is 128. An horizontal or
+-vertical radius of 0 disables blurring.
+-
+-=item B<path:> I<path>
+-
+-Specify the colon-delimited search path for finding background image files.
+-
+-=back
+-
+ =head1 THE SCROLLBAR
+ 
+ Lines of text that scroll off the top of the B<@@RXVT_NAME@@> window
+diff --git a/doc/rxvt.7.pod b/doc/rxvt.7.pod
+index d6028811c558..2caa071e182e 100644
+--- a/doc/rxvt.7.pod
++++ b/doc/rxvt.7.pod
+@@ -2091,7 +2091,6 @@ B<octet> can be escaped by prefixing it with SYN (0x16, ^V).
+ 	B<< C<Ps = 13> >>	Change colour of mouse foreground to B<< C<Pt> >>
+ 	B<< C<Ps = 17> >>	Change background colour of highlight characters to B<< C<Pt> >>
+ 	B<< C<Ps = 19> >>	Change foreground colour of highlight characters to B<< C<Pt> >>
+-	B<< C<Ps = 20> >>	Change background pixmap parameters (see section BACKGROUND IMAGE) (Compile pixbuf).
+ 	B<< C<Ps = 39> >>	Change default foreground colour to B<< C<Pt> >>. [deprecated, use 10]
+ 	B<< C<Ps = 46> >>	Change Log File to B<< C<Pt> >> I<unimplemented>
+ 	B<< C<Ps = 49> >>	Change default background colour to B<< C<Pt> >>. [deprecated, use 11]
+@@ -2100,7 +2099,6 @@ B<octet> can be escaped by prefixing it with SYN (0x16, ^V).
+ 	B<< C<Ps = 701> >>	Change current locale to B<< C<Pt> >>, or, if B<< C<Pt> >> is B<< C<?> >>, return the current locale (Compile frills).
+ 	B<< C<Ps = 702> >>	Request version if B<< C<Pt> >> is B<< C<?> >>, returning C<rxvt-unicode>, the resource name, the major and minor version numbers, e.g. C<ESC ] 702 ; rxvt-unicode ; urxvt ; 7 ; 4 ST>.
+ 	B<< C<Ps = 704> >>	Change colour of italic characters to B<< C<Pt> >>
+-	B<< C<Ps = 705> >>	Change background pixmap tint colour to B<< C<Pt> >> (Compile transparency).
+ 	B<< C<Ps = 706> >>	Change colour of bold characters to B<< C<Pt> >>
+ 	B<< C<Ps = 707> >>	Change colour of underlined characters to B<< C<Pt> >>
+ 	B<< C<Ps = 708> >>	Change colour of the border to B<< C<Pt> >>
+@@ -2116,27 +2114,6 @@ B<octet> can be escaped by prefixing it with SYN (0x16, ^V).
+ 
+ =back
+ 
+-=head1 BACKGROUND IMAGE
+-
+-For the BACKGROUND IMAGE XTerm escape sequence B<< C<ESC ] 20 ; Pt ST> >> the value
+-of B<< C<Pt> >> can be one of the following commands:
+-
+-=over 4
+-
+-=item B<< C<?> >>
+-
+-display scale and position in the title
+-
+-=item B<< C<;WxH+X+Y> >>
+-
+-change scale and/or position
+-
+-=item B<< C<FILE;WxH+X+Y> >>
+-
+-change background image
+-
+-=back
+-
+ X<Mouse>
+ 
+ =head1 Mouse Reporting
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 1586a4af44b2..18acb39e1037 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -36,7 +36,7 @@ first_rule: all
+ dummy:
+ 
+ COMMON = \
+-	background.o command.o rxvtfont.o init.o main.o misc.o \
++	command.o rxvtfont.o init.o main.o misc.o \
+ 	screen.o scrollbar.o scrollbar-next.o scrollbar-rxvt.o \
+ 	scrollbar-xterm.o scrollbar-plain.o xdefaults.o encoding.o \
+ 	rxvttoolkit.o rxvtutil.o keyboard.o rxvtimg.o \
+diff --git a/src/background.C b/src/background.C
+deleted file mode 100644
+index 0ec1044fcd4e..000000000000
+--- a/src/background.C
++++ /dev/null
+@@ -1,544 +0,0 @@
+-/*----------------------------------------------------------------------*
+- * File:	background.C
+- *----------------------------------------------------------------------*
+- *
+- * All portions of code are copyright by their respective author/s.
+- * Copyright (c) 2005-2008 Marc Lehmann <schmorp@schmorp.de>
+- * Copyright (c) 2007      Sasha Vasko <sasha@aftercode.net>
+- * Copyright (c) 2010-2012 Emanuele Giaquinta <e.giaquinta@glauco.it>
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 3 of the License, or
+- * (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+- *---------------------------------------------------------------------*/
+-
+-#include "../config.h"		/* NECESSARY */
+-#include "rxvt.h"		/* NECESSARY */
+-
+-#ifdef HAVE_BG_PIXMAP
+-
+-void
+-rxvt_term::bg_destroy ()
+-{
+-# if BG_IMAGE_FROM_ROOT
+-  delete root_img;
+-  root_img = 0;
+-# endif
+-
+-# if BG_IMAGE_FROM_FILE
+-  fimage.destroy ();
+-# endif
+-}
+-
+-bool
+-rxvt_term::bg_window_size_sensitive ()
+-{
+-# if BG_IMAGE_FROM_ROOT
+-  if (root_img)
+-    return true;
+-# endif
+-
+-# if BG_IMAGE_FROM_FILE
+-  if (fimage.img)
+-    {
+-      if ((fimage.flags & IM_IS_SIZE_SENSITIVE)
+-          || fimage.img->w > szHint.width
+-          || fimage.img->h > szHint.height)
+-        return true;
+-    }
+-# endif
+-
+-  return false;
+-}
+-
+-bool
+-rxvt_term::bg_window_position_sensitive ()
+-{
+-# if BG_IMAGE_FROM_ROOT
+-  if (root_img)
+-    return true;
+-# endif
+-
+-# if BG_IMAGE_FROM_FILE
+-  if (fimage.img)
+-    {
+-      if (fimage.flags & IM_ROOT_ALIGN)
+-        return true;
+-    }
+-# endif
+-
+-  return false;
+-}
+-
+-# if BG_IMAGE_FROM_FILE
+-static inline int
+-make_align_position (int align, int window_size, int image_size)
+-{
+-  if (align >= 0 && align <= 100)
+-    return lerp (0, window_size - image_size, align);
+-  else if (align > 100)
+-    return lerp (window_size - image_size, window_size, align - 100);
+-  else
+-    return lerp (-image_size, 0, align + 100);
+-}
+-
+-static void
+-parse_style (const char *style, int &x, int &y, unsigned int &w, unsigned int &h, uint8_t &flags)
+-{
+-  if (!strcasecmp (style, "tiled"))
+-    {
+-      flags = IM_TILE;
+-      w = h = noScale;
+-      x = y = 0;
+-    }
+-  else if (!strcasecmp (style, "aspect-stretched"))
+-    {
+-      flags = IM_KEEP_ASPECT;
+-      w = h = windowScale;
+-      x = y = centerAlign;
+-    }
+-  else if (!strcasecmp (style, "stretched"))
+-    {
+-      flags = 0;
+-      w = h = windowScale;
+-      x = y = centerAlign;
+-    }
+-  else if (!strcasecmp (style, "centered"))
+-    {
+-      flags = 0;
+-      w = h = noScale;
+-      x = y = centerAlign;
+-    }
+-  else if (!strcasecmp (style, "root-tiled"))
+-    {
+-      flags = IM_TILE|IM_ROOT_ALIGN;
+-      w = h = noScale;
+-      x = y = 0;
+-    }
+-}
+-
+-bool
+-rxvt_image::set_geometry (const char *geom, bool update)
+-{
+-  bool changed = false;
+-  int geom_flags = 0;
+-  int x = h_align;
+-  int y = v_align;
+-  unsigned int w = h_scale;
+-  unsigned int h = v_scale;
+-  uint8_t new_flags = 0;
+-
+-  if (geom == NULL)
+-    return false;
+-
+-  if (geom[0])
+-    {
+-      char **arr = rxvt_strsplit (':', geom);
+-
+-      for (int i = 0; arr[i]; i++)
+-        {
+-          if (!strncasecmp (arr[i], "style=", 6))
+-            {
+-              parse_style (arr[i] + 6, x, y, w, h, new_flags);
+-              geom_flags = WidthValue|HeightValue|XValue|YValue;
+-            }
+-          else if (!strcasecmp (arr[i], "op=tile"))
+-            new_flags |= IM_TILE;
+-          else if (!strcasecmp (arr[i], "op=keep-aspect"))
+-            new_flags |= IM_KEEP_ASPECT;
+-          else if (!strcasecmp (arr[i], "op=root-align"))
+-            new_flags |= IM_ROOT_ALIGN;
+-
+-          // deprecated
+-          else if (!strcasecmp (arr[i], "tile"))
+-            {
+-              new_flags |= IM_TILE;
+-              w = h = noScale;
+-              geom_flags |= WidthValue|HeightValue;
+-            }
+-          else if (!strcasecmp (arr[i], "propscale"))
+-            {
+-              new_flags |= IM_KEEP_ASPECT;
+-              w = h = windowScale;
+-              geom_flags |= WidthValue|HeightValue;
+-            }
+-          else if (!strcasecmp (arr[i], "hscale"))
+-            {
+-              new_flags |= IM_TILE;
+-              w = windowScale;
+-              h = noScale;
+-              geom_flags |= WidthValue|HeightValue;
+-            }
+-          else if (!strcasecmp (arr[i], "vscale"))
+-            {
+-              new_flags |= IM_TILE;
+-              h = windowScale;
+-              w = noScale;
+-              geom_flags |= WidthValue|HeightValue;
+-            }
+-          else if (!strcasecmp (arr[i], "scale"))
+-            {
+-              w = h = windowScale;
+-              geom_flags |= WidthValue|HeightValue;
+-            }
+-          else if (!strcasecmp (arr[i], "auto"))
+-            {
+-              w = h = windowScale;
+-              x = y = centerAlign;
+-              geom_flags |= WidthValue|HeightValue|XValue|YValue;
+-            }
+-          else if (!strcasecmp (arr[i], "root"))
+-            {
+-              new_flags |= IM_TILE|IM_ROOT_ALIGN;
+-              w = h = noScale;
+-              geom_flags |= WidthValue|HeightValue;
+-            }
+-
+-          else
+-            geom_flags |= XParseGeometry (arr[i], &x, &y, &w, &h);
+-        } /* done parsing ops */
+-
+-      rxvt_free_strsplit (arr);
+-    }
+-
+-  new_flags |= flags & ~IM_GEOMETRY_FLAGS;
+-
+-  if (!update)
+-    {
+-      if (!(geom_flags & XValue))
+-        x = y = defaultAlign;
+-      else if (!(geom_flags & YValue))
+-        y = x;
+-
+-      if (!(geom_flags & (WidthValue|HeightValue)))
+-        w = h = defaultScale;
+-      else if (!(geom_flags & HeightValue))
+-        h = w;
+-      else if (!(geom_flags & WidthValue))
+-        w = h;
+-    }
+-
+-  clamp_it (x, -100, 200);
+-  clamp_it (y, -100, 200);
+-
+-  if (flags != new_flags
+-      || h_scale != w
+-      || v_scale != h
+-      || h_align != x
+-      || v_align != y)
+-    {
+-      flags = new_flags;
+-      h_scale = w;
+-      v_scale = h;
+-      h_align = x;
+-      v_align = y;
+-      changed = true;
+-    }
+-
+-  if (is_size_sensitive ())
+-    flags |= IM_IS_SIZE_SENSITIVE;
+-  else
+-    flags &= ~IM_IS_SIZE_SENSITIVE;
+-
+-  return changed;
+-}
+-
+-void
+-rxvt_term::render_image (rxvt_image &image)
+-{
+-  int image_width = image.img->w;
+-  int image_height = image.img->h;
+-  int parent_width = szHint.width;
+-  int parent_height = szHint.height;
+-  int h_scale = min (image.h_scale, 32767 * 100 / parent_width);
+-  int v_scale = min (image.v_scale, 32767 * 100 / parent_height);
+-
+-  int w;
+-  int h;
+-  int x;
+-  int y;
+-
+-  w = h_scale * parent_width / 100;
+-  h = v_scale * parent_height / 100;
+-
+-  if (image.flags & IM_KEEP_ASPECT)
+-    {
+-      float scale = (float)w / image_width;
+-      min_it (scale, (float)h / image_height);
+-      w = image_width * scale + 0.5;
+-      h = image_height * scale + 0.5;
+-    }
+-
+-  if (!w) w = image_width;
+-  if (!h) h = image_height;
+-
+-  if (image.flags & IM_ROOT_ALIGN)
+-    {
+-      x = -parent_x;
+-      y = -parent_y;
+-    }
+-  else
+-    {
+-      x = make_align_position (image.h_align, parent_width, w);
+-      y = make_align_position (image.v_align, parent_height, h);
+-    }
+-
+-  if (!(image.flags & IM_ROOT_ALIGN)
+-      && (x >= parent_width
+-          || y >= parent_height
+-          || x + w <= 0
+-          || y + h <= 0))
+-    return;
+-
+-  rxvt_img *img = image.img->scale (w, h);
+-
+-  if (image.flags & IM_TILE)
+-    img->repeat_mode (RepeatNormal);
+-  else
+-    img->repeat_mode (RepeatNone);
+-  img->sub_rect (-x, -y, parent_width, parent_height)->replace (img);
+-
+-  if (bg_img)
+-    img->draw (bg_img, PictOpOver, image.alpha * 1. / 0xffff);
+-
+-  XRenderPictFormat *format = XRenderFindVisualFormat (dpy, visual);
+-  img->convert_format (format, pix_colors [Color_bg])->replace (img);
+-
+-  delete bg_img;
+-  bg_img = img;
+-}
+-
+-rxvt_image::rxvt_image ()
+-{
+-  alpha = 0xffff;
+-  flags = 0;
+-  h_scale =
+-  v_scale = defaultScale;
+-  h_align =
+-  v_align = defaultAlign;
+-
+-  img = 0;
+-}
+-
+-void
+-rxvt_image::set_file_geometry (rxvt_screen *s, const char *file)
+-{
+-  if (!file || !*file)
+-    return;
+-
+-  const char *p = strchr (file, ';');
+-
+-  if (p)
+-    {
+-      size_t len = p - file;
+-      char *f = rxvt_temp_buf<char> (len + 1);
+-      memcpy (f, file, len);
+-      f[len] = '\0';
+-      file = f;
+-    }
+-
+-  set_file (s, file);
+-  alpha = 0x8000;
+-  set_geometry (p ? p + 1 : "");
+-}
+-
+-void
+-rxvt_image::set_file (rxvt_screen *s, const char *file)
+-{
+-  rxvt_img *img2 = rxvt_img::new_from_file (s, file);
+-  delete img;
+-  img = img2;
+-}
+-
+-# endif /* BG_IMAGE_FROM_FILE */
+-
+-bool
+-image_effects::set_blur (const char *geom)
+-{
+-  bool changed = false;
+-  unsigned int hr, vr;
+-  int junk;
+-  int geom_flags = XParseGeometry (geom, &junk, &junk, &hr, &vr);
+-
+-  if (!(geom_flags & WidthValue))
+-    hr = 1;
+-  if (!(geom_flags & HeightValue))
+-    vr = hr;
+-
+-  min_it (hr, 128);
+-  min_it (vr, 128);
+-
+-  if (h_blurRadius != hr)
+-    {
+-      changed = true;
+-      h_blurRadius = hr;
+-    }
+-
+-  if (v_blurRadius != vr)
+-    {
+-      changed = true;
+-      v_blurRadius = vr;
+-    }
+-
+-  return changed;
+-}
+-
+-bool
+-image_effects::set_tint (const rxvt_color &new_tint)
+-{
+-  if (!tint_set || tint != new_tint)
+-    {
+-      tint = new_tint;
+-      tint_set = true;
+-
+-      return true;
+-    }
+-
+-  return false;
+-}
+-
+-bool
+-image_effects::set_shade (const char *shade_str)
+-{
+-  int new_shade = atoi (shade_str);
+-
+-  clamp_it (new_shade, -100, 200);
+-  if (new_shade < 0)
+-    new_shade = 200 - (100 + new_shade);
+-
+-  if (new_shade != shade)
+-    {
+-      shade = new_shade;
+-      return true;
+-    }
+-
+-  return false;
+-}
+-
+-# if BG_IMAGE_FROM_ROOT
+-/*
+- * Builds a pixmap of the same size as the terminal window that contains
+- * the tiled portion of the root pixmap that is supposed to be covered by
+- * our window.
+- */
+-void
+-rxvt_term::render_root_image ()
+-{
+-  /* root dimensions may change from call to call - but Display structure should
+-   * be always up-to-date, so let's use it :
+-   */
+-  int screen = display->screen;
+-  int root_width = DisplayWidth (dpy, screen);
+-  int root_height = DisplayHeight (dpy, screen);
+-  int parent_width = szHint.width;
+-  int parent_height = szHint.height;
+-  int sx, sy;
+-
+-  sx = parent_x;
+-  sy = parent_y;
+-
+-  /* check if we are outside of the visible part of the virtual screen : */
+-  if (sx + parent_width <= 0 || sy + parent_height <= 0
+-      || sx >= root_width || sy >= root_height)
+-    return;
+-
+-  while (sx < 0) sx += root_img->w;
+-  while (sy < 0) sy += root_img->h;
+-
+-  rxvt_img *img = root_img->sub_rect (sx, sy, parent_width, parent_height);
+-
+-  if (root_effects.need_blur ())
+-    img->blur (root_effects.h_blurRadius, root_effects.v_blurRadius)->replace (img);
+-
+-  if (root_effects.need_tint ())
+-    {
+-      rgba c (rgba::MAX_CC, rgba::MAX_CC, rgba::MAX_CC);
+-
+-      if (root_effects.tint_set)
+-        root_effects.tint.get (c);
+-      rxvt_img::nv factor = root_effects.shade / 100. - 1.;
+-      img->shade (factor, c)->replace (img);
+-    }
+-
+-  XRenderPictFormat *format = XRenderFindVisualFormat (dpy, visual);
+-  img->convert_format (format, pix_colors [Color_bg])->replace (img);
+-
+-  delete bg_img;
+-  bg_img = img;
+-}
+-# endif /* BG_IMAGE_FROM_ROOT */
+-
+-void
+-rxvt_term::bg_render ()
+-{
+-  if (bg_flags & BG_INHIBIT_RENDER)
+-    return;
+-
+-  delete bg_img;
+-  bg_img = 0;
+-  bg_flags = 0;
+-
+-  if (!mapped)
+-    return;
+-
+-# if BG_IMAGE_FROM_ROOT
+-  if (root_img)
+-    {
+-      render_root_image ();
+-      bg_flags |= BG_IS_TRANSPARENT;
+-    }
+-# endif
+-
+-# if BG_IMAGE_FROM_FILE
+-  if (fimage.img)
+-    render_image (fimage);
+-# endif
+-
+-  scr_recolor (false);
+-  bg_flags |= BG_NEEDS_REFRESH;
+-
+-  bg_valid_since = ev::now ();
+-}
+-
+-void
+-rxvt_term::bg_init ()
+-{
+-#if BG_IMAGE_FROM_ROOT
+-  if (option (Opt_transparent))
+-    {
+-      if (rs [Rs_blurradius])
+-        root_effects.set_blur (rs [Rs_blurradius]);
+-
+-      if (ISSET_PIXCOLOR (Color_tint))
+-        root_effects.set_tint (pix_colors_focused [Color_tint]);
+-
+-      if (rs [Rs_shade])
+-        root_effects.set_shade (rs [Rs_shade]);
+-
+-      rxvt_img::new_from_root (this)->replace (root_img);
+-      XSelectInput (dpy, display->root, PropertyChangeMask);
+-      rootwin_ev.start (display, display->root);
+-    }
+-#endif
+-
+-#if BG_IMAGE_FROM_FILE
+-  if (rs[Rs_backgroundPixmap])
+-    {
+-      fimage.set_file_geometry (this, rs[Rs_backgroundPixmap]);
+-      if (!bg_window_position_sensitive ())
+-        update_background ();
+-    }
+-#endif
+-}
+-
+-#endif /* HAVE_BG_PIXMAP */
+diff --git a/src/command.C b/src/command.C
+index 21fde58c66a5..19e4fccf6897 100644
+--- a/src/command.C
++++ b/src/command.C
+@@ -1484,16 +1484,6 @@ rxvt_term::x_cb (XEvent &ev)
+ 
+             bool want_position_change = SHOULD_INVOKE (HOOK_POSITION_CHANGE);
+ 
+-            bool moved = false;
+-#ifdef HAVE_BG_PIXMAP
+-            if (bg_window_position_sensitive ())
+-              {
+-                want_position_change = true;
+-                if (bg_img == 0)
+-                  moved = true;
+-              }
+-#endif
+-
+             if (want_position_change)
+               {
+                 int x, y;
+@@ -1511,7 +1501,6 @@ rxvt_term::x_cb (XEvent &ev)
+                     parent_x = x;
+                     parent_y = y;
+                     HOOK_INVOKE ((this, HOOK_POSITION_CHANGE, DT_INT, x, DT_INT, y, DT_END));
+-                    moved = true;
+                   }
+               }
+ 
+@@ -1520,13 +1509,6 @@ rxvt_term::x_cb (XEvent &ev)
+                 seen_resize = 1;
+                 resize_all_windows (ev.xconfigure.width, ev.xconfigure.height, 1);
+               }
+-            else
+-              {
+-#ifdef HAVE_BG_PIXMAP
+-                if (moved)
+-                  update_background ();
+-#endif
+-              }
+ 
+             HOOK_INVOKE ((this, HOOK_CONFIGURE_NOTIFY, DT_XEVENT, &ev, DT_END));
+           }
+@@ -1545,17 +1527,6 @@ rxvt_term::x_cb (XEvent &ev)
+         break;
+ 
+       case MapNotify:
+-#ifdef HAVE_BG_PIXMAP
+-        // This is needed at startup for the case of no window manager
+-        // or a non-reparenting window manager and also because we
+-        // defer bg image updates if the window is not mapped. The
+-        // short delay is to optimize for multiple ConfigureNotify
+-        // events at startup when the window manager reparents the
+-        // window, so as to perform the computation after we have
+-        // received all of them.
+-        if (bg_img == 0)
+-          update_background_ev.start (0.025);
+-#endif
+         mapped = 1;
+ #ifdef TEXT_BLINK
+         text_blink_ev.start ();
+@@ -1860,7 +1831,7 @@ rxvt_term::update_fade_color (unsigned int idx, bool first_time)
+ #endif
+ }
+ 
+-#if BG_IMAGE_FROM_ROOT || ENABLE_PERL
++#if ENABLE_PERL
+ void ecb_hot
+ rxvt_term::rootwin_cb (XEvent &ev)
+ {
+@@ -1880,13 +1851,6 @@ rxvt_term::rootwin_cb (XEvent &ev)
+         if (ev.xproperty.atom == xa[XA_XROOTPMAP_ID]
+             || ev.xproperty.atom == xa[XA_ESETROOT_PMAP_ID])
+           {
+-#if BG_IMAGE_FROM_ROOT
+-            if (option (Opt_transparent))
+-              {
+-                rxvt_img::new_from_root (this)->replace (root_img);
+-                update_background ();
+-              }
+-#endif
+             HOOK_INVOKE ((this, HOOK_ROOTPMAP_CHANGE, DT_END));
+           }
+ 
+@@ -3571,74 +3535,6 @@ rxvt_term::process_xterm_seq (int op, char *str, char resp)
+         process_color_seq (op, Color_border, str, resp);
+         break;
+ 
+-#if BG_IMAGE_FROM_ROOT
+-      case URxvt_Color_tint:
+-        process_color_seq (op, Color_tint, str, resp);
+-        {
+-          bool changed = false;
+-
+-          if (ISSET_PIXCOLOR (Color_tint))
+-            changed = root_effects.set_tint (pix_colors_focused [Color_tint]);
+-
+-          if (changed)
+-            update_background ();
+-        }
+-
+-        break;
+-#endif
+-
+-#if BG_IMAGE_FROM_FILE
+-      case Rxvt_Pixmap:
+-        if (!strcmp (str, "?"))
+-          {
+-            char str[256];
+-            int h_scale = fimage.h_scale;
+-            int v_scale = fimage.v_scale;
+-            int h_align = fimage.h_align;
+-            int v_align = fimage.v_align;
+-
+-            sprintf (str, "[%dx%d+%d+%d]",
+-                     h_scale, v_scale,
+-                     h_align, v_align);
+-            process_xterm_seq (XTerm_title, str, CHAR_ST);
+-          }
+-        else
+-          {
+-            bool changed = false;
+-
+-            if (*str != ';')
+-              {
+-                try
+-                  {
+-                    fimage.set_file_geometry (this, str);
+-                    changed = true;
+-                  }
+-                catch (const class rxvt_failure_exception &e)
+-                  {
+-                  }
+-              }
+-            else
+-              {
+-                str++;
+-                if (fimage.set_geometry (str, true))
+-                  changed = true;
+-              }
+-
+-            if (changed)
+-              {
+-                if (bg_window_position_sensitive ())
+-                  {
+-                    int x, y;
+-                    get_window_origin (x, y);
+-                    parent_x = x;
+-                    parent_y = y;
+-                  }
+-                update_background ();
+-              }
+-          }
+-        break;
+-#endif
+-
+       case XTerm_logfile:
+         // TODO, when secure mode?
+         break;
+diff --git a/src/init.C b/src/init.C
+index e1e7d83b3ebc..f4af5440398a 100644
+--- a/src/init.C
++++ b/src/init.C
+@@ -561,9 +561,6 @@ static const char *const def_colorName[] =
+ #ifdef RXVT_SCROLLBAR
+     COLOR_SCROLLTROUGH,
+ #endif
+-#if BG_IMAGE_FROM_ROOT
+-    NULL,
+-#endif
+ #if OFF_FOCUS_FADING
+     "rgb:00/00/00",
+ #endif
+@@ -868,10 +865,6 @@ rxvt_term::init2 (int argc, const char *const *argv)
+   if (option (Opt_scrollBar))
+     scrollBar.resize ();      /* create and map scrollbar */
+ 
+-#ifdef HAVE_BG_PIXMAP
+-  bg_init ();
+-#endif
+-
+ #if ENABLE_PERL
+   rootwin_ev.start (display, display->root);
+ #endif
+diff --git a/src/main.C b/src/main.C
+index 5fa605e311cc..98d4c4f46c7f 100644
+--- a/src/main.C
++++ b/src/main.C
+@@ -153,9 +153,6 @@ int rxvt_composite_vec::expand (unicode_t c, wchar_t *r)
+ 
+ rxvt_term::rxvt_term ()
+ {
+-#if HAVE_BG_PIXMAP
+-  update_background_ev.set<rxvt_term, &rxvt_term::update_background_cb> (this);
+-#endif
+ #ifdef CURSOR_BLINK
+   cursor_blink_ev.set     <rxvt_term, &rxvt_term::cursor_blink_cb> (this); cursor_blink_ev.set (0., CURSOR_BLINK_INTERVAL);
+ #endif
+@@ -171,7 +168,7 @@ rxvt_term::rxvt_term ()
+ #if defined(MOUSE_WHEEL) && defined(MOUSE_SLIP_WHEELING)
+   slip_wheel_ev.set       <rxvt_term, &rxvt_term::slip_wheel_cb>   (this);
+ #endif
+-#if BG_IMAGE_FROM_ROOT || ENABLE_PERL
++#if ENABLE_PERL
+   rootwin_ev.set          <rxvt_term, &rxvt_term::rootwin_cb> (this),
+ #endif
+   scrollbar_ev.set        <rxvt_term, &rxvt_term::x_cb>       (this),
+@@ -225,10 +222,6 @@ rxvt_term::~rxvt_term ()
+ #endif
+   delete fontset[0];
+ 
+-#ifdef HAVE_BG_PIXMAP
+-  bg_destroy ();
+-#endif
+-
+ #if HAVE_IMG
+   delete bg_img;
+ #endif
+@@ -329,7 +322,7 @@ rxvt_term::destroy ()
+       im_ev.stop (display);
+ #endif
+       scrollbar_ev.stop (display);
+-#if BG_IMAGE_FROM_ROOT || ENABLE_PERL
++#if ENABLE_PERL
+       rootwin_ev.stop (display);
+ #endif
+       termwin_ev.stop (display);
+@@ -1024,7 +1017,7 @@ rxvt_term::get_colorfgbg ()
+     if (pix_colors[Color_bg] == pix_colors[i])
+       {
+         sprintf (bstr, "%d", i - Color_Black);
+-#if BG_IMAGE_FROM_FILE
++#if HAVE_IMG
+         xpmb = "default;";
+ #endif
+         break;
+@@ -1160,11 +1153,6 @@ rxvt_term::resize_all_windows (unsigned int newwidth, unsigned int newheight, in
+                          vt_width, vt_height);
+ 
+       HOOK_INVOKE ((this, HOOK_SIZE_CHANGE, DT_INT, newwidth, DT_INT, newheight, DT_END));
+-
+-#ifdef HAVE_BG_PIXMAP
+-      if (bg_window_size_sensitive ())
+-        update_background ();
+-#endif
+     }
+ 
+   if (fix_screen || old_height == 0)
+@@ -1707,32 +1695,4 @@ rxvt_term::get_window_origin (int &x, int &y)
+   XTranslateCoordinates (dpy, parent, display->root, 0, 0, &x, &y, &cr);
+ }
+ 
+-#ifdef HAVE_BG_PIXMAP
+-
+-void
+-rxvt_term::update_background ()
+-{
+-  if (update_background_ev.is_active ())
+-    return;
+-
+-  ev_tstamp to_wait = 0.5 - (ev::now () - bg_valid_since);
+-
+-  if (to_wait <= 0.)
+-    bg_render ();
+-  else
+-    update_background_ev.start (to_wait);
+-}
+-
+-void
+-rxvt_term::update_background_cb (ev::timer &w, int revents)
+-{
+-  make_current ();
+-
+-  update_background_ev.stop ();
+-  bg_render ();
+-  refresh_check ();
+-}
+-
+-#endif /* HAVE_BG_PIXMAP */
+-
+ /*----------------------- end-of-file (C source) -----------------------*/
+diff --git a/src/perl/background b/src/perl/background
+index a2c91f24c194..c7edef5107de 100644
+--- a/src/perl/background
++++ b/src/perl/background
+@@ -3,6 +3,16 @@
+ #:META:RESOURCE:%.expr:string:background expression
+ #:META:RESOURCE:%.border:boolean:respect the terminal border
+ #:META:RESOURCE:%.interval:seconds:minimum time between updates
++#:META:RESOURCE:pixmap:file[;geom]:set image as background
++#:META:RESOURCE:backgroundPixmap:file[;geom]:set image as background
++#:META:RESOURCE:tr:boolean:set root pixmap as background
++#:META:RESOURCE:transparent:boolean:set root pixmap as background
++#:META:RESOURCE:tint:color:tint background with color
++#:META:RESOURCE:tintColor:color:tint background with color
++#:META:RESOURCE:sh:number:shade background by number %
++#:META:RESOURCE:shading:number:shade background by number %
++#:META:RESOURCE:blr:HxV:gaussian-blur background with radii
++#:META:RESOURCE:blurRadius:HxV:gaussian-blur background with radii
+ 
+ =head1 NAME
+ 
+@@ -1024,6 +1034,147 @@ in case the root background changes: If expression inside the block
+ is sensitive to some event (root background changes, window geometry
+ changes), then it will be reevaluated automatically as needed.
+ 
++=back
++
++=head1 OLD BACKGROUND IMAGE SETTINGS
++
++This extension also provides support for the old options/resources and
++OSC sequences for setting a background image. These settings are
++B<deprecated> and will be removed in future versions.
++
++=head2 OPTIONS AND RESOURCES
++
++=over 4
++
++=item B<-pixmap> I<file[;oplist]>
++
++=item B<backgroundPixmap:> I<file[;oplist]>
++
++Use the specified image file as the window's background and also
++optionally specify a colon separated list of operations to modify it.
++Note that you may need to quote the C<;> character when using the
++command line option, as C<;> is usually a metacharacter in shells.
++Supported operations are:
++
++=over 4
++
++=item B<WxH+X+Y>
++
++sets scale and position. B<"W" / "H"> specify the horizontal/vertical
++scale (percent), and B<"X" / "Y"> locate the image centre (percent). A
++scale of 0 disables scaling.
++
++=item B<op=tile>
++
++enables tiling
++
++=item B<op=keep-aspect>
++
++maintain the image aspect ratio when scaling
++
++=item B<op=root-align>
++
++use the position of the terminal window relative to the root window as
++the image offset, simulating a root window background
++
++=back
++
++The default scale and position setting is C<100x100+50+50>.
++Alternatively, a predefined set of templates can be used to achieve
++the most common setups:
++
++=over 4
++
++=item B<style=tiled>
++
++the image is tiled with no scaling. Equivalent to 0x0+0+0:op=tile
++
++=item B<style=aspect-stretched>
++
++the image is scaled to fill the whole window maintaining the aspect
++ratio and centered. Equivalent to 100x100+50+50:op=keep-aspect
++
++=item B<style=stretched>
++
++the image is scaled to fill the whole window. Equivalent to 100x100
++
++=item B<style=centered>
++
++the image is centered with no scaling. Equivalent to 0x0+50+50
++
++=item B<style=root-tiled>
++
++the image is tiled with no scaling and using 'root' positioning.
++Equivalent to 0x0:op=tile:op=root-align
++
++=back
++
++If multiple templates are specified the last one wins. Note that a
++template overrides all the scale, position and operations settings.
++
++If used in conjunction with pseudo-transparency, the specified image
++will be blended over the transparent background using alpha-blending.
++
++=item B<-tr>|B<+tr>
++
++=item B<transparent:> I<boolean>
++
++Turn on/off pseudo-transparency by using the root pixmap as background.
++
++=item B<-tint> I<colour>
++
++=item B<tintColor:> I<colour>
++
++Tint the transparent background with the given colour. Note that a
++black tint yields a completely black image while a white tint yields
++the image unchanged.
++
++=item B<-sh> I<number>
++
++=item B<shading:> I<number>
++
++Darken (0 .. 99) or lighten (101 .. 200) the transparent background.
++A value of 100 means no shading.
++
++=item B<-blr> I<HxV>
++
++=item B<blurRadius:> I<HxV>
++
++Apply gaussian blur with the specified radius to the transparent
++background. If a single number is specified, the vertical and
++horizontal radii are considered to be the same. Setting one of the
++radii to 1 and the other to a large number creates interesting effects
++on some backgrounds. The maximum radius value is 128. An horizontal or
++vertical radius of 0 disables blurring.
++
++=back
++
++=head2 OSC sequences
++
++=over 4
++
++=item B<< C<ESC ] 705 ; Pt ST> >> Change transparent background tint colour to B<< C<Pt> >>.
++
++=item B<< C<ESC ]  20 ; Pt ST> >> Change/Query background image
++parameters: the value of B<< C<Pt> >> can be one of the following
++commands:
++
++=over 4
++
++=item B<< C<?> >>
++
++display scale and position in the title
++
++=item B<< C<;WxH+X+Y> >>
++
++change scale and/or position
++
++=item B<< C<FILE;WxH+X+Y> >>
++
++change background image
++
++=back
++
+ =cut
+ 
+    sub keep(&) {
+@@ -1192,11 +1343,218 @@ sub recalculate {
+    $self->want_refresh;
+ }
+ 
++sub old_bg_opts {
++   my ($self, $arg) = @_;
++
++   $arg or return;
++
++   my @str = split /;/, $arg;
++
++   return unless $str[0] or $self->{bg_opts}->{path};
++
++   my $bg_opts = $self->{bg_opts};
++
++   if ($str[0]) {
++      $bg_opts->{tile} = 0;
++      $bg_opts->{keep_aspect} = 0;
++      $bg_opts->{root_align} = 0;
++      $bg_opts->{h_scale} = $bg_opts->{v_scale} = 100;
++      $bg_opts->{h_align} = $bg_opts->{v_align} = 50;
++      $bg_opts->{path} = unpack "H*", $str[0];
++   }
++
++   my @oplist = split /:/, $str[1];
++
++   for (@oplist) {
++      if (/style=tiled/i) {
++         $bg_opts->{tile} = 1;
++         $bg_opts->{keep_aspect} = 0;
++         $bg_opts->{root_align} = 0;
++         $bg_opts->{h_scale} = $bg_opts->{v_scale} = 0;
++         $bg_opts->{h_align} = $bg_opts->{v_align} = 0;
++      } elsif (/style=aspect-stretched/i) {
++         $bg_opts->{tile} = 0;
++         $bg_opts->{keep_aspect} = 1;
++         $bg_opts->{root_align} = 0;
++         $bg_opts->{h_scale} = $bg_opts->{v_scale} = 100;
++         $bg_opts->{h_align} = $bg_opts->{v_align} = 50;
++      } elsif (/style=stretched/i) {
++         $bg_opts->{tile} = 0;
++         $bg_opts->{keep_aspect} = 0;
++         $bg_opts->{root_align} = 0;
++         $bg_opts->{h_scale} = $bg_opts->{v_scale} = 100;
++         $bg_opts->{h_align} = $bg_opts->{v_align} = 50;
++      } elsif (/style=centered/i) {
++         $bg_opts->{tile} = 0;
++         $bg_opts->{keep_aspect} = 0;
++         $bg_opts->{root_align} = 0;
++         $bg_opts->{h_scale} = $bg_opts->{v_scale} = 0;
++         $bg_opts->{h_align} = $bg_opts->{v_align} = 50;
++      } elsif (/style=root-tiled/i) {
++         $bg_opts->{tile} = 1;
++         $bg_opts->{keep_aspect} = 0;
++         $bg_opts->{root_align} = 1;
++         $bg_opts->{h_scale} = $bg_opts->{v_scale} = 0;
++         $bg_opts->{h_align} = $bg_opts->{v_align} = 0;
++      } elsif (/op=tile/i) {
++         $bg_opts->{tile} = 1;
++      } elsif (/op=keep_aspect/i) {
++         $bg_opts->{keep_aspect} = 1;
++      } elsif (/op=root_align/i) {
++         $bg_opts->{root_align} = 1;
++      } elsif (/^ =? ([0-9]+)? (?:[xX] ([0-9]+))? ([+-][0-9]+)? ([+-][0-9]+)? $/x) {
++         my ($w, $h, $x, $y) = ($1, $2, $3, $4);
++
++         if ($str[0]) {
++            $w = $h unless defined $w;
++            $h = $w unless defined $h;
++            $y = $x unless defined $y;
++         }
++
++         $bg_opts->{h_scale} = $w if defined $w;
++         $bg_opts->{v_scale} = $h if defined $h;
++         $bg_opts->{h_align} = $x if defined $x;
++         $bg_opts->{v_align} = $y if defined $y;
++      }
++   }
++}
++
++sub old_bg_expr {
++   my ($self) = @_;
++
++   my $expr;
++
++   my $bg_opts = $self->{bg_opts};
++
++   if ($bg_opts->{root}) {
++      $expr .= "tile (";
++
++      my $shade = $bg_opts->{shade};
++
++      if ($shade) {
++         $shade = List::Util::min $shade, 200;
++         $shade = List::Util::max $shade, -100;
++         $shade = 200 - (100 + $shade) if $shade < 0;
++
++         $shade = $shade * 0.01 - 1;
++         $expr .= "shade $shade, ";
++      }
++
++      my $tint = $bg_opts->{tint};
++
++      if ($tint) {
++         $expr .= "tint $tint, ";
++      }
++
++      my $blur = $bg_opts->{blur};
++
++      if ($blur and $blur =~ /^ =? ([0-9]+)? (?:[xX] ([0-9]+))? $/x) {
++         my $hr = defined $1 ? $1 : 1;
++         my $vr = defined $2 ? $2 : $hr;
++
++         if ($hr != 0 and $vr != 0) {
++            $expr .= "blur $hr, $vr, ";
++         }
++      }
++
++      $expr .= "rootalign root)";
++   }
++
++   if ($bg_opts->{path}) {
++      my $file_expr;
++      my $h_scale = $bg_opts->{h_scale} * 0.01;
++      my $v_scale = $bg_opts->{v_scale} * 0.01;
++      my $h_align = $bg_opts->{h_align} * 0.01;
++      my $v_align = $bg_opts->{v_align} * 0.01;
++
++      if (!$bg_opts->{tile}) {
++         $file_expr .= "pad (";
++      } else {
++         $file_expr .= "tile (";
++      }
++
++      if ($bg_opts->{root_align}) {
++         $file_expr .= "rootalign ";
++      } else {
++         $file_expr .= "align $h_align, $v_align, ";
++      }
++
++      if ($h_scale != 0 and $v_scale != 0) {
++         my $op = $bg_opts->{keep_aspect} ? "fit" : "resize";
++         $file_expr .= "$op TW * $h_scale, TH * $v_scale, ";
++      }
++
++      $file_expr .= "keep { load pack \"H*\", \"$bg_opts->{path}\" })";
++
++      if ($expr) {
++         $expr .= ", tint (\"[50]white\", $file_expr)";
++      } else {
++         $expr = $file_expr;
++      }
++   }
++
++   $expr
++}
++
++sub on_osc_seq {
++   my ($self, $op, $arg) = @_;
++
++   $self->{bg_opts} or return;
++
++   $op =~ /^(20|705)$/ or return;
++
++   if ($op eq "20") {
++      if ($arg eq "?") {
++         my $h_scale = $self->{bg_opts}->{h_scale};
++         my $v_scale = $self->{bg_opts}->{v_scale};
++         my $h_align = $self->{bg_opts}->{h_align};
++         my $v_align = $self->{bg_opts}->{v_align};
++         $self->cmd_parse ("\033]2;[${h_scale}x${v_scale}+${h_align}+${v_align}]\007");
++      } else {
++         $self->old_bg_opts ($arg);
++         my $expr = $self->old_bg_expr;
++         $self->set_expr (parse_expr $expr) if $expr;
++      }
++   } elsif ($op eq "705") {
++      $self->{bg_opts}->{tint} = $arg;
++      my $expr = $self->old_bg_expr;
++      $self->set_expr (parse_expr $expr) if $expr;
++   }
++
++   1
++}
++
++sub find_resource {
++   my ($self, $a, $b) = @_;
++
++   my $v = $self->x_resource ($a);
++   $v = $self->x_resource ($b) unless defined $v;
++
++   $v
++}
++
+ sub on_start {
+    my ($self) = @_;
+ 
+-   my $expr = $self->x_resource ("%.expr")
+-      or return;
++   my $expr = $self->x_resource ("%.expr");
++
++   if (!$expr) {
++      $self->{bg_opts} = { h_scale => 100, v_scale => 100,
++                           h_align => 50, v_align => 50 };
++
++      $self->{bg_opts}->{shade} = $self->find_resource ("shading", "sh");
++      $self->{bg_opts}->{tint} = $self->find_resource ("tintColor", "tint");
++      $self->{bg_opts}->{blur} = $self->find_resource ("blurRadius", "blr");
++      if ($self->x_resource_boolean ("transparent")
++          or $self->x_resource_boolean ("tr")) {
++         $self->{bg_opts}->{root} = 1;
++      }
++
++      $self->old_bg_opts ($self->find_resource ("backgroundPixmap", "pixmap"));
++      $expr = $self->old_bg_expr;
++   }
++
++   $expr or return;
+ 
+    $self->has_render
+       or die "background extension needs RENDER extension 0.10 or higher, ignoring background-expr.\n";
+diff --git a/src/rsinc.h b/src/rsinc.h
+index 86d0dfe45fe2..5b80329662d7 100644
+--- a/src/rsinc.h
++++ b/src/rsinc.h
+@@ -17,10 +17,6 @@
+ #endif
+   def (name)
+   def (title)
+-#if BG_IMAGE_FROM_FILE
+-  def (path)
+-  def (backgroundPixmap)
+-#endif
+   def (loginShell)
+   def (multiClickTime)
+   def (jumpScroll)
+@@ -59,11 +55,6 @@
+   def (preeditType)
+   def (inputMethod)
+ #endif
+-#if BG_IMAGE_FROM_ROOT
+-  def (transparent)
+-  def (shade)
+-  def (blurradius)
+-#endif
+ #if XFT
+   def (buffered)
+ #endif
+diff --git a/src/rxvt.h b/src/rxvt.h
+index 56e1ac8336d8..5e5ee2df4ef5 100644
+--- a/src/rxvt.h
++++ b/src/rxvt.h
+@@ -77,19 +77,9 @@ typedef  int32_t tlen_t_; // specifically for use in the line_t structure
+ #endif
+ 
+ #if XRENDER && (HAVE_PIXBUF || ENABLE_TRANSPARENCY)
+-# define HAVE_BG_PIXMAP 1
+ # define HAVE_IMG 1
+ #endif
+ 
+-#if HAVE_BG_PIXMAP
+-# if HAVE_PIXBUF
+-#  define BG_IMAGE_FROM_FILE 1
+-# endif
+-# if ENABLE_TRANSPARENCY
+-#  define BG_IMAGE_FROM_ROOT 1
+-# endif
+-#endif
+-
+ #include <ecb.h>
+ #include "encoding.h"
+ #include "rxvtutil.h"
+@@ -214,85 +204,6 @@ struct localise_env
+   }
+ };
+ 
+-#ifdef HAVE_BG_PIXMAP
+-struct image_effects
+-{
+-  bool tint_set;
+-  rxvt_color tint;
+-  int shade;
+-  int h_blurRadius, v_blurRadius;
+-
+-  image_effects ()
+-  {
+-    tint_set     =
+-    h_blurRadius =
+-    v_blurRadius = 0;
+-    shade = 100;
+-  }
+-
+-  bool need_tint ()
+-  {
+-    return shade != 100 || tint_set;
+-  }
+-
+-  bool need_blur ()
+-  {
+-    return h_blurRadius && v_blurRadius;
+-  }
+-
+-  bool set_tint (const rxvt_color &new_tint);
+-  bool set_shade (const char *shade_str);
+-  bool set_blur (const char *geom);
+-};
+-
+-# if BG_IMAGE_FROM_FILE
+-enum {
+-  IM_IS_SIZE_SENSITIVE = 1 << 1,
+-  IM_KEEP_ASPECT       = 1 << 2,
+-  IM_ROOT_ALIGN        = 1 << 3,
+-  IM_TILE              = 1 << 4,
+-  IM_GEOMETRY_FLAGS    = IM_KEEP_ASPECT | IM_ROOT_ALIGN | IM_TILE,
+-};
+-
+-enum {
+-  noScale = 0,
+-  windowScale = 100,
+-  defaultScale = windowScale,
+-  centerAlign = 50,
+-  defaultAlign = centerAlign,
+-};
+-
+-struct rxvt_image : image_effects
+-{
+-  unsigned short alpha;
+-  uint8_t flags;
+-  unsigned int h_scale, v_scale; /* percents of the window size */
+-  int h_align, v_align;          /* percents of the window size:
+-                                    0 - left align, 50 - center, 100 - right */
+-
+-  bool is_size_sensitive ()
+-  {
+-    return (!(flags & IM_TILE)
+-            || h_scale || v_scale
+-            || (!(flags & IM_ROOT_ALIGN) && (h_align || v_align)));
+-  }
+-
+-  rxvt_img *img;
+-
+-  void destroy ()
+-  {
+-    delete img;
+-    img = 0;
+-  }
+-
+-  rxvt_image ();
+-  void set_file_geometry (rxvt_screen *s, const char *file);
+-  void set_file (rxvt_screen *s, const char *file);
+-  bool set_geometry (const char *geom, bool update = false);
+-};
+-# endif
+-#endif
+-
+ /*
+  *****************************************************************************
+  * STRUCTURES AND TYPEDEFS
+@@ -344,7 +255,7 @@ struct mouse_event
+ 
+ /* COLORTERM, TERM environment variables */
+ #define COLORTERMENV    "rxvt"
+-#if BG_IMAGE_FROM_FILE
++#if HAVE_IMG
+ # define COLORTERMENVFULL COLORTERMENV "-xpm"
+ #else
+ # define COLORTERMENVFULL COLORTERMENV
+@@ -512,14 +423,12 @@ enum {
+   Rxvt_restoreFG         = 39,
+   Rxvt_restoreBG         = 49,
+ 
+-  Rxvt_Pixmap            = 20,      // new bg pixmap
+   Rxvt_dumpscreen        = 55,      // dump scrollback and all of screen
+ 
+   URxvt_locale           = 701,     // change locale
+   URxvt_version          = 702,     // request version
+ 
+   URxvt_Color_IT         = 704,     // change actual 'Italic' colour
+-  URxvt_Color_tint       = 705,     // change actual tint colour
+   URxvt_Color_BD         = 706,     // change actual 'Bold' color
+   URxvt_Color_UL         = 707,     // change actual 'Underline' color
+   URxvt_Color_border     = 708,
+@@ -604,9 +513,6 @@ enum colour_list {
+ #ifdef RXVT_SCROLLBAR
+   Color_trough,
+ #endif
+-#if BG_IMAGE_FROM_ROOT
+-  Color_tint,
+-#endif
+ #if OFF_FOCUS_FADING
+   Color_fade,
+ #endif
+@@ -1195,35 +1101,10 @@ struct rxvt_term : zero_initialized, rxvt_vars, rxvt_screen
+   static struct termios def_tio;
+   row_col_t       oldcursor;
+ 
+-#ifdef HAVE_BG_PIXMAP
+-  void bg_init ();
+-  void bg_destroy ();
+-
+-# if BG_IMAGE_FROM_FILE
+-  rxvt_image fimage;
+-  void render_image (rxvt_image &image);
+-# endif
+-
+-# if BG_IMAGE_FROM_ROOT
+-  rxvt_img *root_img;
+-  image_effects root_effects;
+-
+-  void render_root_image ();
+-# endif
+-
+-  ev_tstamp bg_valid_since;
+-
+-  bool bg_window_size_sensitive ();
+-  bool bg_window_position_sensitive ();
+-
+-  void bg_render ();
+-#endif
+-
+ #ifdef HAVE_IMG
+   enum {
+     BG_IS_TRANSPARENT    = 1 << 1,
+     BG_NEEDS_REFRESH     = 1 << 2,
+-    BG_INHIBIT_RENDER    = 1 << 3,
+   };
+ 
+   uint8_t bg_flags;
+@@ -1297,15 +1178,10 @@ struct rxvt_term : zero_initialized, rxvt_vars, rxvt_screen
+     XSelectInput (dpy, vt, vt_emask | vt_emask_perl | vt_emask_xim | vt_emask_mouse);
+   }
+ 
+-#if BG_IMAGE_FROM_ROOT || ENABLE_PERL
++#if ENABLE_PERL
+   void rootwin_cb (XEvent &xev);
+   xevent_watcher rootwin_ev;
+ #endif
+-#ifdef HAVE_BG_PIXMAP
+-  void update_background ();
+-  void update_background_cb (ev::timer &w, int revents);
+-  ev::timer update_background_ev;
+-#endif
+ 
+   void x_cb (XEvent &xev);
+   xevent_watcher termwin_ev;
+diff --git a/src/rxvtfont.C b/src/rxvtfont.C
+index 1914539cad6c..c56921c84eab 100644
+--- a/src/rxvtfont.C
++++ b/src/rxvtfont.C
+@@ -241,7 +241,7 @@ rxvt_font::clear_rect (rxvt_drawable &d, int x, int y, int w, int h, int color)
+ #if XFT
+       Picture dst;
+ 
+-# ifdef HAVE_BG_PIXMAP
++# ifdef HAVE_IMG
+       if (term->bg_img
+           && !term->pix_colors[color].is_opaque ()
+           && ((dst = XftDrawPicture (d))))
+@@ -1412,7 +1412,7 @@ rxvt_font_xft::draw (rxvt_drawable &d, int x, int y,
+         {
+           rxvt_drawable &d2 = d.screen->scratch_drawable (w, h);
+ 
+-#ifdef HAVE_BG_PIXMAP
++#ifdef HAVE_IMG
+           Picture dst = 0; // the only assignment is done conditionally in the following if condition
+ 
+           if (term->bg_img
+diff --git a/src/rxvtperl.xs b/src/rxvtperl.xs
+index 9c75aad71476..8f8ab5b398af 100644
+--- a/src/rxvtperl.xs
++++ b/src/rxvtperl.xs
+@@ -2303,7 +2303,7 @@ rxvt_term::set_background (rxvt_img *img, bool border = false)
+                ->replace (img);
+ 
+             THIS->bg_img = img;
+-            THIS->bg_flags |= rxvt_term::BG_NEEDS_REFRESH | rxvt_term::BG_INHIBIT_RENDER;
++            THIS->bg_flags |= rxvt_term::BG_NEEDS_REFRESH;
+ 
+             if (!border)
+               THIS->bg_flags |= rxvt_term::BG_IS_TRANSPARENT;
+diff --git a/src/xdefaults.C b/src/xdefaults.C
+index b1e529cbd18c..9b47bf2c4151 100644
+--- a/src/xdefaults.C
++++ b/src/xdefaults.C
+@@ -115,13 +115,6 @@ optList[] = {
+               BOOL (Rs_scrollTtyOutput, NULL, "si",  Opt_scrollTtyOutput, Optflag_Reverse, "scroll-on-tty-output inhibit"),
+               BOOL (Rs_scrollTtyKeypress, "scrollTtyKeypress", "sk", Opt_scrollTtyKeypress, 0, "scroll-on-keypress"),
+               BOOL (Rs_scrollWithBuffer, "scrollWithBuffer", "sw", Opt_scrollWithBuffer, 0, "scroll-with-buffer"),
+-#if BG_IMAGE_FROM_ROOT
+-              BOOL (Rs_transparent, "inheritPixmap", "ip", Opt_transparent, 0, "inherit parent pixmap"),
+-              BOOL (Rs_transparent, "transparent", "tr", Opt_transparent, 0, "inherit parent pixmap"),
+-              STRG (Rs_color + Color_tint, "tintColor", "tint", "color", "tint color"),
+-              STRG (Rs_shade, "shading", "sh", "number", "shade background by number %."),
+-              STRG (Rs_blurradius, "blurRadius", "blr", "HxV", "gaussian blur radii to apply to the root background"),
+-#endif
+ #if OFF_FOCUS_FADING
+               STRG (Rs_fade, "fading", "fade", "number", "fade colors by number % when losing focus"),
+               STRG (Rs_color + Color_fade, "fadeColor", "fadecolor", "color", "target color for off-focus fading"),
+@@ -196,10 +189,6 @@ optList[] = {
+               STRG (Rs_color + Color_pointer_fg, "pointerColor", "pr", "color", "pointer color"),
+               STRG (Rs_color + Color_pointer_bg, "pointerColor2", "pr2", "color", "pointer bg color"),
+               STRG (Rs_color + Color_border, "borderColor", "bd", "color", "border color"),
+-#if BG_IMAGE_FROM_FILE
+-              RSTRG (Rs_path, "path", "search path"),
+-              STRG (Rs_backgroundPixmap, "backgroundPixmap", "pixmap", "file[;geom]", "background pixmap"),
+-#endif
+ #if ENABLE_EWMH
+               STRG (Rs_iconfile, "iconFile", "icon", "file", "path to application icon image"),
+ #endif
+-- 
+2.9.4
+

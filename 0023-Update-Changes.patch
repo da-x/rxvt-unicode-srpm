@@ -1,0 +1,37 @@
+From 03175be9e23f77a778788086cbf5418d58f06bed Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Tue, 26 Jul 2016 17:17:35 +0000
+Subject: [PATCH 23/30] Update Changes.
+
+---
+ Changes | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/Changes b/Changes
+index 6842f9d8918b..38876ba61cf5 100644
+--- a/Changes
++++ b/Changes
+@@ -39,6 +39,20 @@ TODO: c&c perl socket via daemon-ext mechanism
+ TODO: simplify extension metainfo cache, cache on disk
+ TODO: URxvt::Ext::Name installs urxvt ext name and provides pod/manpage for URxvt::Ext::Name
+ 
++TODO: üpixel droppins idenrasm,ll,scrollup
++
++	- ISO 8613-3 direct colour SGR sequences (patch by Fengguang Wu).
++	- xterm focus reporting mode (patch by Daniel Hahler).
++	- in some window managers, if smart resize was enabled, urxvt
++	  erroneously moved the window on font change - awesome bug
++	  #532, arch linux bug ##34807 (patch by Uli Schlachter).
++	- the old bg image resources are now provided by the background
++	  extension, and perl is thus required for bg image support. No
++	  configuration change is needed: urxvt autoloads the background
++	  ext if any bg image resource/option is present. The old bg image
++	  resources are also now deprecated; users are encouraged to
++	  switch to the new bg image interface (see man urxvt-background).
++
+ 9.22 Sat Jan 23 21:07:33 CET 2016
+ 	- NOTICE: this release updates terminfo.
+ 	- add terminfo capabilities for various ctrl and shift-ctrl key variants
+-- 
+2.9.4
+

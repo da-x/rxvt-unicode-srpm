@@ -1,0 +1,25 @@
+From 13664e5ade1e25e06301eb0d3d09c7b1623a2733 Mon Sep 17 00:00:00 2001
+From: Emanuele Giaquinta <e.giaquinta@glauco.it>
+Date: Thu, 7 Jul 2016 17:38:34 +0000
+Subject: [PATCH 19/31] Doc fix.
+
+---
+ src/perl/background | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/perl/background b/src/perl/background
+index f50acf6371af..a2c91f24c194 100644
+--- a/src/perl/background
++++ b/src/perl/background
+@@ -134,7 +134,7 @@ get a percentage):
+    scale 2, load "$HOME/mypic.png"
+ 
+ This enlarges the image by a factor of 2 (200%). As you can see, C<scale>
+-has now two arguments, the C<200> and the C<load> expression, while
++has now two arguments, the C<2> and the C<load> expression, while
+ C<load> only has one argument. Arguments are separated from each other by
+ commas.
+ 
+-- 
+2.9.4
+
